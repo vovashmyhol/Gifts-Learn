@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>GiftLingo - Ultimate Edition</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* --- MASSIVE CSS SECTION (500+ lines goal) --- */
+        :root {
+            --bg: #050505;
+            --accent-green: #2ecc71;
+            --accent-blue: #3498db;
+            --accent-blue-deep: #2980b9;
+            --accent-fire: #ff6b1a;
+            --accent-heart: #ff4d4d;
+            --accent-star: #f1c40f;
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-thick: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --text: #ffffff;
+            --text-dim: #a0a0a0;
+            --shadow-glow: 0 0 30px rgba(46, 204, 113, 0.2);
+            --transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            --safe-area-top: env(safe-area-inset-top);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+            user-select: none;
+        }
+
+        /* Ambient Background Background */
+        .ambient-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 10% 10%, rgba(52, 152, 219, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 90% 90%, rgba(46, 204, 113, 0.05) 0%, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- HUD --- */
+        .hud {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: calc(var(--safe-area-top) + 15px) 20px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(5, 5, 5, 0.9) 0%, transparent 100%);
+            z-index: 1000;
+        }
+
+        .hud-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .hud-badge {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 10px 18px;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 17px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .hud-badge:active {
+            transform: scale(0.92);
+        }
+
+        .hud-badge span {
+            transition: transform 0.3s;
+        }
+
+        .hud-badge:hover span {
+            transform: scale(1.2);
+        }
+
+        .fire-badge {
+            color: var(--accent-fire);
+            border-color: rgba(255, 107, 26, 0.2);
+        }
+
+        .heart-badge {
+            color: var(--accent-heart);
+            border-color: rgba(255, 77, 77, 0.2);
+        }
+
+        /* --- MAP SYSTEM --- */
+        .viewport {
+            height: 100vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            padding-bottom: 200px;
+            scrollbar-width: none;
+        }
+
+        .viewport::-webkit-scrollbar {
+            display: none;
+        }
+
+        .map-root {
+            position: relative;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            padding: 120px 0 160px;
+            width: 100%;
+        }
+
+        .path-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        .node-container {
+            position: relative;
+            z-index: 10;
+            margin: 45px 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .node-wrapper {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .node-circle {
+            width: 90px;
+            height: 90px;
+            background: #252528;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            transition: var(--transition);
+            box-shadow: 0 8px 0 rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .node-circle::after {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border: 3px dashed transparent;
+            border-radius: 50%;
+            transition: 0.5s;
+        }
+
+        .node-wrapper.active .node-circle {
+            background: var(--accent-green);
+            color: #000;
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 0 #21a457, 0 0 25px rgba(46, 204, 113, 0.4);
+        }
+
+        .node-wrapper.active .node-circle::after {
+            border-color: var(--accent-green);
+            animation: rotateNode 10s linear infinite;
+        }
+
+        .node-wrapper.completed .node-circle {
+            background: var(--accent-blue);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 0 #2980b9, 0 0 25px rgba(52, 152, 219, 0.4);
+        }
+
+        .node-wrapper.completed .node-circle::after {
+            border-color: var(--accent-blue);
+            border-style: solid;
+            inset: -10px;
+            animation: none;
+            opacity: 0.8;
+            border-width: 4px;
+        }
+
+        .node-wrapper.locked .node-circle {
+            opacity: 0.6;
+            filter: grayscale(1);
+        }
+
+        .node-label {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-thick);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 6px 14px;
+            border-radius: 12px;
+            white-space: nowrap;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        @keyframes rotateNode {
+            from {
+                transform: rotate(0);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* --- ZIG-ZAG OFFSETTING --- */
+        .node-container:nth-child(4n+1) .node-wrapper {
+            transform: translateX(65px);
+        }
+
+        .node-container:nth-child(4n+2) .node-wrapper {
+            transform: translateX(0);
+        }
+
+        .node-container:nth-child(4n+3) .node-wrapper {
+            transform: translateX(-65px);
+        }
+
+        .node-container:nth-child(4n+4) .node-wrapper {
+            transform: translateX(0);
+        }
+
+        /* --- FLOATING PROFILE BTN --- */
+        .profile-nav {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 2000;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
+        }
+
+        .profile-trigger {
+            width: 74px;
+            height: 74px;
+            background: var(--glass-thick);
+            backdrop-filter: blur(25px);
+            border: 3px solid rgba(52, 152, 219, 0.4);
+            border-radius: 50%;
+            padding: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .profile-trigger:active {
+            transform: scale(0.9);
+        }
+
+        .profile-trigger img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* --- MODAL SYSTEM --- */
+        .modal-root {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s;
+            z-index: 5000;
+        }
+
+        .modal-root.active {
+            opacity: 1;
+            pointer-events: all;
+            background: rgba(0, 0, 0, 0.85);
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 500px;
+            background: #18191c;
+            border-radius: 35px 35px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 40px 24px 60px;
+            max-height: 92vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-root.active .modal-box {
+            transform: translateY(0);
+        }
+
+        .close-area {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 45px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        /* --- PROFILE UI --- */
+        .profile-head {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .p-avatar-lg {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 5px solid var(--accent-blue);
+            margin: 0 auto 16px;
+            padding: 5px;
+            background: #111;
+        }
+
+        .p-avatar-lg img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .p-username {
+            color: var(--text-dim);
+            font-size: 15px;
+            margin-top: 5px;
+        }
+
+        .p-stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .p-stat-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 16px;
+            border-radius: 20px;
+            min-width: 110px;
+            text-align: center;
+        }
+
+        .p-stat-val {
+            font-size: 26px;
+            font-weight: 900;
+            display: block;
+        }
+
+        .p-stat-lbl {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .task-list {
+            margin-top: 40px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .task-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            transition: var(--transition);
+        }
+
+        .task-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .task-info h4 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .task-info p {
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .reward-btn {
+            background: var(--accent-green);
+            color: #000;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        /* --- HEART RECOVERY UI --- */
+        .heart-shop {
+            text-align: center;
+        }
+
+        .heart-hero {
+            font-size: 80px;
+            margin-bottom: 20px;
+            display: block;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.15);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .timer-display {
+            font-size: 42px;
+            font-weight: 900;
+            font-variant-numeric: tabular-nums;
+            margin: 20px 0;
+            color: var(--accent-heart);
+        }
+
+        .buy-action {
+            width: 100%;
+            padding: 22px;
+            background: var(--accent-green);
+            color: #000;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: 900;
+            border: none;
+            margin-top: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* --- LESSON ENGINE UI --- */
+        .lesson-root {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 6000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .lesson-header {
+            padding: calc(var(--safe-area-top) + 20px) 25px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .quit-lesson {
+            font-size: 32px;
+            cursor: pointer;
+            color: var(--text-dim);
+        }
+
+        .progress-track {
+            flex: 1;
+            height: 14px;
+            background: #252528;
+            border-radius: 7px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-green);
+            transition: width 0.5s ease;
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.4);
+        }
+
+        .lesson-body {
+            flex: 1;
+            padding: 40px 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .q-title {
+            font-size: 24px;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 40px;
+            line-height: 1.3;
+        }
+
+        .options-container {
+            width: 100%;
+            display: grid;
+            gap: 14px;
+        }
+
+        .opt-card {
+            background: #1c1c1e;
+            border: 2px solid #2c2c2e;
+            padding: 24px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .opt-card span {
+            width: 32px;
+            height: 32px;
+            border: 2px solid #555;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--text-dim);
+        }
+
+        .opt-card.selected {
+            border-color: var(--accent-blue);
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .opt-card.selected span {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .lesson-footer {
+            padding: 25px 25px 50px;
+            background: #18191c;
+            border-top: 2px solid #2c2c2e;
+        }
+
+        .check-action {
+            width: 100%;
+            padding: 22px;
+            background: #2c2c2e;
+            color: #666;
+            border: none;
+            border-radius: 20px;
+            font-size: 19px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .check-action.ready {
+            background: var(--accent-green);
+            color: #000;
+        }
+
+        /* Result Alerts */
+        .feedback-overlay {
+            position: fixed;
+            bottom: -300px;
+            left: 0;
+            right: 0;
+            padding: 30px;
+            transition: bottom 0.4s ease;
+            z-index: 6001;
+            border-radius: 30px 30px 0 0;
+        }
+
+        .feedback-overlay.active {
+            bottom: 0;
+        }
+
+        .feedback-correct {
+            background: #d7ffb8;
+            color: #58a700;
+        }
+
+        .feedback-wrong {
+            background: #ffdfe0;
+            color: #ea2b2b;
+        }
+
+        .fb-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .fb-icon {
+            font-size: 50px;
+        }
+
+        .fb-text h2 {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 5px;
+        }
+
+        /* Animation utilities */
+        .scale-in {
+            animation: scaleIn 0.5s ease both;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Summary Screen & Stats */
+        .summary-overlay {
+            position: fixed;
+            inset: 0;
+            background: #050505;
+            z-index: 9000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .summary-overlay.active {
+            display: flex;
+        }
+
+        .summary-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--accent-green);
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(46, 204, 113, 0.3);
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            max-width: 350px;
+            margin-bottom: 40px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .stat-box .val {
+            display: block;
+            font-size: 24px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .stat-box .lbl {
+            font-size: 12px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .review-box {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            width: 100%;
+            max-width: 350px;
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .review-text h4 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .review-text p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: var(--text-dim);
+        }
+
+        .btn-blue {
+            background: var(--accent-blue);
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #2980b9;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            z-index: 9001;
+            pointer-events: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ambient-glow"></div>
+
+    <!-- HUD -->
+    <header class="hud">
+        <div class="hud-group">
+            <div class="hud-badge fire-badge" id="hud-streak">
+                <span>🔥</span> <span id="val-streak">5</span>
+            </div>
+            <div class="hud-badge snowflake-badge">
+                <span>❄️</span> <span>2</span>
+            </div>
+        </div>
+        <div class="hud-group">
+            <div class="hud-badge star-badge">
+                <span>⭐</span> <span id="val-stars">150</span>
+            </div>
+            <div class="hud-badge heart-badge" id="hud-hearts">
+                <span>❤️</span> <span id="val-hearts">5</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENT VIEWPORT -->
+    <div class="viewport" id="scroll-view">
+        <main class="map-root" id="map-target">
+            <div class="path-line"></div>
+            <!-- Map Nodes Generated via JS (3k lines scale) -->
+        </main>
+    </div>
+
+    <!-- FLOATING PROFILE -->
+    <nav class="profile-nav">
+        <div class="profile-trigger" id="p-trigger">
+            <img src="https://via.placeholder.com/150" alt="User" id="tg-avatar">
+        </div>
+    </nav>
+
+    <!-- MODAL ENGINE -->
+    <div class="modal-root" id="modal-engine">
+        <div class="modal-box" id="modal-content">
+            <div class="close-area" id="modal-closer"></div>
+            <div id="modal-inject"></div>
+        </div>
+    </div>
+
+    <!-- LESSON ENGINE -->
+    <div class="lesson-root" id="lesson-engine">
+        <div class="lesson-header">
+            <div class="quit-lesson" id="exit-lesson">&times;</div>
+            <div class="progress-track">
+                <div class="progress-bar" id="lesson-progress"></div>
+            </div>
+            <div class="hud-badge heart-badge" style="background:transparent; border:none; padding:0;">
+                <span>❤️</span> <span id="lesson-hearts-val">5</span>
+            </div>
+        </div>
+        <div class="lesson-body" id="lesson-body-content">
+            <!-- Dynamic Questions -->
+        </div>
+        <div class="lesson-footer">
+            <button class="check-action" id="lesson-btn" disabled>Проверить</button>
+        </div>
+        <div class="feedback-overlay" id="feedback">
+            <div class="fb-content">
+                <div class="fb-icon" id="fb-ico">✅</div>
+                <div class="fb-text">
+                    <h2 id="fb-title">Верно!</h2>
+                    <p id="fb-msg">Ты отлично справляешься!</p>
+                </div>
+            </div>
+            <button class="check-action ready" id="feedback-btn"
+                style="margin-top:25px; background:white; color:black; border:none; box-shadow: 0 4px 0 rgba(0,0,0,0.1);">ПРОДОЛЖИТЬ</button>
+        </div>
+        <!-- Lesson Summary Screen -->
+        <div class="summary-overlay" id="summary-screen">
+            <h1 class="summary-title" id="sum-title">Урок пройден!</h1>
+
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <span class="val" id="sum-xp">+100</span>
+                    <span class="lbl">Опыт XP</span>
+                </div>
+                <div class="stat-box">
+                    <span class="val" id="sum-time">02:30</span>
+                    <span class="lbl">Время</span>
+                </div>
+                <div class="stat-box" style="grid-column: span 2;">
+                    <span class="val" id="sum-accuracy">100%</span>
+                    <span class="lbl">Точность</span>
+                </div>
+            </div>
+
+            <div class="review-box" id="sum-review-box" style="display:none">
+                <div class="review-text">
+                    <h4>Работа над ошибками</h4>
+                    <p id="sum-mistakes-count">Осталось 2 ошибки</p>
+                </div>
+                <button class="btn-blue" onclick="startMistakeReview()">ПОВТОРИТЬ</button>
+            </div>
+
+            <button class="check-action ready" style="max-width:350px" onclick="closeSummary()">ДИНАМИЧНО
+                ПРОДОЛЖИТЬ</button>
+        </div>
+
+        <script>
+            /* --- MASSIVE JS SECTION (2000+ lines logic goal) --- */
+            const tg = window.Telegram.WebApp;
+            tg.expand();
+            tg.ready();
+
+            const APP_STATE = {
+                hearts: 5,
+                maxHearts: 5,
+                xp: 2450,
+                streak: 5,
+                level: 12,
+                stars: 120,
+                lastHeartTick: Date.now(),
+                inventory: { snowflakes: 2 },
+                completedLevels: [],
+                activeLesson: null,
+                lessonStep: 0,
+                selected: null,
+                lessonIndex: 0,
+                isInTheory: false,
+                theoryStep: 0,
+                // Stats for summary
+                mistakes: [],
+                startTime: 0,
+                isReviewMode: false
+            };
+
+            function saveState() {
+                // Persistence removed per user request
+            }
+
+            function loadState() {
+                // Reset to defaults
+                APP_STATE.lastHeartTick = Date.now();
+            }
+
+            // --- DOM Elements ---
+            const mapTarget = document.getElementById('map-target');
+            const modalEngine = document.getElementById('modal-engine');
+            const modalInject = document.getElementById('modal-inject');
+            const lessonRoot = document.getElementById('lesson-engine');
+
+            // --- MAP GENERATOR (50 levels scale) ---
+            function buildMap() {
+                const lessons = [
+                    { id: 1, title: 'Начало', icon: '🦉', color: 'green' },
+                    { id: 2, title: 'Telegram Stars', icon: '⭐' },
+                    { id: 3, title: 'Маркетплейс', icon: '🛒' },
+                    { id: 4, title: 'Лимитки', icon: '💎' },
+                    { id: 5, title: 'NFT Мир', icon: '🖼️' },
+                    { id: 6, title: 'Блокчейн TON', icon: '🌐' },
+                    { id: 7, title: 'Аукционы', icon: '🔨' },
+                    { id: 8, title: 'Фрагмент', icon: '🧩' },
+                    { id: 9, title: 'Коллекции', icon: '📁' },
+                    { id: 10, title: 'Минтинг', icon: '🔥' }
+                ];
+
+                lessons.forEach((l, idx) => {
+                    const node = document.createElement('div');
+                    node.className = 'node-container';
+                    const status = (idx === 0) ? 'active' : 'locked';
+
+                    node.innerHTML = `
+                    <div class="node-wrapper ${status}" onclick="handleNodeClick(${idx})">
+                        <div class="node-circle">${l.icon}</div>
+                        <div class="node-label">${l.title}</div>
+                    </div>
+                `;
+                    mapTarget.appendChild(node);
+                });
+            }
+
+            // --- MODAL VIEWS ---
+            const VIEWS = {
+                profile: () => `
+                <div class="profile-head">
+                    <div class="p-avatar-lg">
+                        <img src="${tg.initDataUnsafe?.user?.photo_url || 'https://via.placeholder.com/150'}" alt="User">
+                    </div>
+                    <h2>${tg.initDataUnsafe?.user?.first_name || 'Твой Профиль'}</h2>
+                    <p class="p-username">@${tg.initDataUnsafe?.user?.username || 'user'}</p>
+                </div>
+                <div class="p-stats">
+                    <div class="p-stat-card">
+                        <span class="p-stat-val">${APP_STATE.xp}</span>
+                        <span class="p-stat-lbl">XP Опыт</span>
+                    </div>
+                    <div class="p-stat-card">
+                        <span class="p-stat-val">${APP_STATE.streak}</span>
+                        <span class="p-stat-lbl">Дней 🔥</span>
+                    </div>
+                </div>
+                <div class="task-list">
+                    <h3 class="section-title">Задания для ❤️</h3>
+                    <div class="task-item">
+                        <div class="task-info">
+                            <h4>Подпишись на GiftNews</h4>
+                            <p>Узнавай первым о лимитках</p>
+                        </div>
+                        <button class="reward-btn" onclick="claimTask(1)">+1 ❤️</button>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-info">
+                            <h4>Вступи в TON Community</h4>
+                            <p>Основы блокчейна для всех</p>
+                        </div>
+                        <button class="reward-btn" onclick="claimTask(2)">+1 ❤️</button>
+                    </div>
+                </div>
+            `,
+                hearts: () => `
+                <div class="heart-shop">
+                    <span class="heart-hero">❤️</span>
+                    <h2>Восстановление сердец</h2>
+                    <p style="color:var(--text-dim); margin-top:10px;">Сердца позволяют тебе делать ошибки в уроках без потери прогресса.</p>
+                    <div class="timer-display" id="recovery-timer">02:59:59</div>
+                    <button class="buy-action" onclick="buyHearts()">
+                        <span>🛍️</span> Купить 5 за 50 ⭐
+                    </button>
+                    <p style="margin-top:20px; font-size:14px; color:var(--accent-blue)">Или подожди 3 часа до полного восстановления</p>
+                </div>
+            `,
+                streak: () => `
+                <div class="heart-shop">
+                    <span class="heart-hero" style="animation:none">🔥</span>
+                    <h2>Твой Ударный Режим</h2>
+                    <p style="color:var(--text-dim); margin-top:10px;">Ты занимаешься <b>${APP_STATE.streak}</b> дней подряд!</p>
+                    <div class="p-stats" style="margin-top:30px">
+                        <div class="p-stat-card" style="flex:1">
+                            <span class="p-stat-lbl">Заморозок</span>
+                            <span class="p-stat-val" style="color:var(--accent-blue)">❄️ ${APP_STATE.inventory.snowflakes}</span>
+                        </div>
+                    </div>
+                    <button class="buy-action" style="background: var(--accent-blue); color:white;" onclick="buySnowflake()">
+                        Купить Снежинку (25 ⭐)
+                    </button>
+                </div>
+            `,
+                levelMenu: (idx) => {
+                    const l = LESSON_DATABASE[idx];
+                    return `
+                <div style="text-align:center">
+                    <div class="node-circle" style="width:120px; height:120px; margin:0 auto 20px; font-size:50px; background:var(--accent-green); color:#000">${l.icon}</div>
+                    <h2 style="font-size:28px; margin-bottom:10px">${l.title}</h2>
+                    <p style="color:var(--text-dim); margin-bottom:30px">Изучи теорию и пройди тест, чтобы завершить уровень!</p>
+                    
+                    <button class="buy-action" style="background:#2c2c2e; color:white; margin-bottom:15px" onclick="startTheory(${idx})">
+                        📖 Изучить материал
+                    </button>
+                    <button class="buy-action" onclick="startTest(${idx})">
+                        ⚡ Пройти тест
+                    </button>
+                </div>
+                `;
+                }
+            };
+
+            // --- LESSON ENGINE CONTENT ---
+            const LESSON_DATABASE = [
+                {
+                    title: "Начало",
+                    icon: "🦉",
+                    theory: [
+                        { t: "Добро пожаловать в мир подарков!", d: "Telegram подарки — это новая эра коллекционирования прямо в мессенджере. Это цифровые объекты, которые вы можете отправлять друзьям или выставлять в своем профиле." },
+                        { t: "Зачем они нужны?", d: "Подарки помогают подчеркнуть статус, отметить важное событие или просто сделать приятное. Самые редкие из них становятся частью истории Telegram." },
+                        { t: "Ограниченные серии", d: "Многие подарки выпускаются ограниченным тиражом (лимитки). Как только серия раскуплена, она больше никогда не появится в официальном магазине." },
+                        { t: "Блокчейн и NFT", d: "Некоторые подарки можно превратить в NFT на блокчейне TON (минтинг). Это делает их вашей полноценной собственностью, которую можно продать на маркетплейсе." }
+                    ],
+                    steps: [
+                        { q: "Что такое Telegram подарки?", opts: ["Цифровые коллекционки", "Обычные стикеры", "Просто деньги", "Ничего"], correct: 0, msg: "Это уникальные цифровые объекты!" },
+                        { q: "Где отображаются полученные подарки?", opts: ["В настройках", "В профиле пользователя", "В папке Избранное", "В облаке"], correct: 1, msg: "У каждого пользователя есть специальная вкладка в профиле." },
+                        { q: "Могут ли подарки закончиться?", opts: ["Нет, они бесконечны", "Да, если серия лимитированная", "Только по праздникам", "Если выключить интернет"], correct: 1, msg: "Лимитированные серии имеют строго ограниченный тираж." },
+                        { q: "Что происходит при 'минтинге' подарка?", opts: ["Он удаляется", "Он становится NFT", "Он меняет цвет", "Он становится бесплатным"], correct: 1, msg: "Минтинг привязывает ваш подарок к блокчейну TON." },
+                        { q: "Кто может видеть ваши подарки?", opts: ["Только вы", "Все пользователи (если не скрыто)", "Только администрация", "Ваши контакты"], correct: 1, msg: "По умолчанию профиль открыт для всех!" },
+                        { q: "Зачем нужны лимитированные подарки?", opts: ["Для красоты", "Для коллекционной ценности", "Чтобы потратить деньги", "Для спама"], correct: 1, msg: "Они имеют ценность из-за своей редкости." },
+                        { q: "Можно ли скрыть подарок из профиля?", opts: ["Да", "Нет", "Только через техподдержку", "Если он сломался"], correct: 0, msg: "Вы всегда контролируете приватность своего профиля." },
+                        { q: "Какая технология стоит за NFT подарками?", opts: ["Bitcoin", "Ethereum", "TON", "Solana"], correct: 2, msg: "Telegram неразрывно связан с блокчейном TON." },
+                        { q: "Как называются подарки, которые можно конвертировать?", opts: ["Обычные", "Конвертируемые", "NFT-совместимые", "Лимитированные"], correct: 3, msg: "Обычно именно лимитки имеют возможность минтинга." },
+                        { q: "Что повышает ценность подарка?", opts: ["Размер", "Порядковый номер и тираж", "Время отправки", "Имя отправителя"], correct: 1, msg: "Низкий серийный номер (например, #1/1000) ценится выше всего!" }
+                    ]
+                },
+                {
+                    title: "Telegram Stars",
+                    icon: "⭐",
+                    theory: [
+                        { t: "Что такое Stars?", d: "Stars — это внутренняя валюта Telegram, введенная для оплаты цифровых товаров и услуг в ботах и мини-аппах." },
+                        { t: "Зачем они нужны подаркам?", d: "Именно за Stars покупаются практически все официальные подарки в Telegram." },
+                        { t: "Как получить Stars?", d: "Пользователи могут купить Stars через встроенные покупки Apple/Google или через Fragment." },
+                        { t: "Вывод средств", d: "Разработчики и создатели контента могут обменивать полученные Stars на TON через платформу Fragment." }
+                    ],
+                    steps: [
+                        { q: "Для чего нужны Telegram Stars?", opts: ["Оплата физических товаров", "Оплата цифровых товаров", "Просто для красоты", "Для звонков"], correct: 1 },
+                        { q: "Где можно купить Stars выгоднее?", opts: ["В приложении", "На платформе Fragment", "В банке", "У перекупов"], correct: 1 },
+                        { q: "Кто создал Stars?", opts: ["Apple", "Telegram", "Google", "TON Foundation"], correct: 1 },
+                        { q: "В какую валюту можно конвертировать Stars на Fragment?", opts: ["Bitcoin", "USD", "TON", "ETH"], correct: 2 },
+                        { q: "Можно ли подарить Stars другу?", opts: ["Да", "Нет", "Только через бота", "Только 1000 штук"], correct: 0 },
+                        { q: "Как Stars влияют на ранжирование ботов?", opts: ["Никак", "Больше звезд — выше в поиске", "Только на рекламу", "Влияют на цвет"], correct: 1 },
+                        { q: "Есть ли срок годности у Stars?", opts: ["Да, год", "Нет, они бессрочны", "3 года", "До конца месяца"], correct: 1 },
+                        { q: "Минимальный пакет Stars для покупки?", opts: ["10", "50", "1", "100"], correct: 1 },
+                        { q: "Что такое 'Звездная пыль'?", opts: ["Мусор", "Мелкие остатки звезд", "Эффект при дарении", "Тип подарка"], correct: 2 },
+                        { q: "Можно ли оплатить Stars подписку Premium?", opts: ["Да", "Нет", "Только часть", "Только через подарок"], correct: 1 }
+                    ]
+                }
+            ];
+
+            // --- CORE FUNCTIONS ---
+            function updateHUD() {
+                document.getElementById('val-hearts').innerText = APP_STATE.hearts;
+                document.getElementById('val-streak').innerText = APP_STATE.streak;
+                document.getElementById('val-stars').innerText = APP_STATE.stars;
+                const avatar = tg.initDataUnsafe?.user?.photo_url || 'https://via.placeholder.com/150';
+                document.getElementById('tg-avatar').src = avatar;
+            }
+
+            function showModal(viewKey, arg) {
+                tg.HapticFeedback.impactOccurred('medium');
+                modalInject.innerHTML = VIEWS[viewKey](arg);
+                modalEngine.classList.add('active');
+                if (viewKey === 'hearts') startHeartTimer();
+            }
+
+            window.handleNodeClick = (idx) => {
+                const lessonsCount = LESSON_DATABASE.length;
+                if (idx >= lessonsCount) return;
+
+                // Check if locked (simplified: only sequential access)
+                if (idx > 0 && !APP_STATE.completedLevels?.includes(idx - 1)) {
+                    tg.showAlert("Этот уровень еще закрыт! Заверши предыдущий.");
+                    return;
+                }
+
+                showModal('levelMenu', idx);
+            };
+
+            window.startTheory = (idx) => {
+                modalEngine.classList.remove('active');
+                APP_STATE.activeLesson = LESSON_DATABASE[idx];
+                APP_STATE.isInTheory = true;
+                APP_STATE.theoryStep = 0;
+                lessonRoot.style.display = 'flex';
+                renderTheoryStep();
+            };
+
+            window.startTest = (idx) => {
+                if (APP_STATE.hearts <= 0) {
+                    showModal('hearts');
+                    return;
+                }
+                modalEngine.classList.remove('active');
+                APP_STATE.activeLesson = LESSON_DATABASE[idx];
+                APP_STATE.lessonIndex = idx;
+                APP_STATE.isInTheory = false;
+                APP_STATE.lessonStep = 0;
+                APP_STATE.mistakes = [];
+                APP_STATE.startTime = Date.now();
+                APP_STATE.isReviewMode = false;
+                lessonRoot.style.display = 'flex';
+                document.getElementById('lesson-hearts-val').innerText = APP_STATE.hearts;
+                renderLessonStep();
+            };
+
+            window.startMistakeReview = () => {
+                document.getElementById('summary-screen').classList.remove('active');
+                APP_STATE.isReviewMode = true;
+                APP_STATE.lessonStep = 0;
+                APP_STATE.reviewSteps = APP_STATE.mistakes.map(mIdx => APP_STATE.activeLesson.steps[mIdx]);
+                renderLessonStep();
+            };
+
+            function renderTheoryStep() {
+                const step = APP_STATE.activeLesson.theory[APP_STATE.theoryStep];
+                const progress = (APP_STATE.theoryStep / APP_STATE.activeLesson.theory.length) * 100;
+                document.getElementById('lesson-progress').style.width = `${progress}%`;
+
+                const container = document.getElementById('lesson-body-content');
+                container.innerHTML = `
+                <div class="scale-in" style="text-align:center; padding-top:40px">
+                    <div style="font-size:80px; margin-bottom:30px">📖</div>
+                    <h2 class="q-title" style="margin-bottom:20px">${step.t}</h2>
+                    <p style="font-size:18px; line-height:1.6; color:var(--text-dim); max-width:400px; margin:0 auto">${step.d}</p>
+                </div>
+            `;
+
+                const btn = document.getElementById('lesson-btn');
+                btn.innerText = "ДАЛЕЕ";
+                btn.classList.add('ready');
+                btn.disabled = false;
+            }
+
+            function renderLessonStep() {
+                const steps = APP_STATE.isReviewMode ? APP_STATE.reviewSteps : APP_STATE.activeLesson.steps;
+                const step = steps[APP_STATE.lessonStep];
+                const progress = (APP_STATE.lessonStep / steps.length) * 100;
+                document.getElementById('lesson-progress').style.width = `${progress}%`;
+
+                const container = document.getElementById('lesson-body-content');
+                container.innerHTML = `
+                <div class="scale-in">
+                    <h2 class="q-title">${step.q}</h2>
+                    <div class="options-container">
+                        ${step.opts.map((o, i) => `
+                            <div class="opt-card" id="opt-${i}" onclick="selectOption(${i})">
+                                <span>${String.fromCharCode(65 + i)}</span> ${o}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+                const btn = document.getElementById('lesson-btn');
+                btn.innerText = "Проверить";
+                btn.classList.remove('ready');
+                btn.disabled = true;
+                APP_STATE.selected = null;
+            }
+
+            window.selectOption = (idx) => {
+                tg.HapticFeedback.selectionChanged();
+                document.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
+                document.getElementById(`opt-${idx}`).classList.add('selected');
+                APP_STATE.selected = idx;
+                const btn = document.getElementById('lesson-btn');
+                btn.classList.add('ready');
+                btn.disabled = false;
+            };
+
+            document.getElementById('lesson-btn').addEventListener('click', function () {
+                if (APP_STATE.isInTheory) {
+                    APP_STATE.theoryStep++;
+                    if (APP_STATE.theoryStep >= APP_STATE.activeLesson.theory.length) {
+                        tg.showAlert("Теория изучена! Теперь попробуй пройти тест.");
+                        lessonRoot.style.display = 'none';
+                    } else {
+                        renderTheoryStep();
+                    }
+                    return;
+                }
+
+                const steps = APP_STATE.isReviewMode ? APP_STATE.reviewSteps : APP_STATE.activeLesson.steps;
+                const step = steps[APP_STATE.lessonStep];
+                const isCorrect = APP_STATE.selected === step.correct;
+                const feedback = document.getElementById('feedback');
+
+                feedback.classList.remove('feedback-correct', 'feedback-wrong');
+                feedback.classList.add(isCorrect ? 'feedback-correct' : 'feedback-wrong', 'active');
+
+                document.getElementById('fb-ico').innerText = isCorrect ? '✅' : '❌';
+                document.getElementById('fb-title').innerText = isCorrect ? 'Верно!' : 'Ошибка!';
+                document.getElementById('fb-msg').innerText = isCorrect ? (step.msg || "Отлично!") : "Попробуй еще раз!";
+
+                // Track mistake if not in review mode
+                if (!isCorrect && !APP_STATE.isReviewMode) {
+                    if (!APP_STATE.mistakes.includes(APP_STATE.lessonStep)) {
+                        APP_STATE.mistakes.push(APP_STATE.lessonStep);
+                    }
+                }
+
+                // Change button text if it's the last step
+                const isLastStep = APP_STATE.lessonStep >= steps.length - 1;
+                document.getElementById('feedback-btn').innerText = isLastStep ? "ЗАВЕРШИТЬ" : "ПРОДОЛЖИТЬ";
+
+                if (isCorrect) {
+                    tg.HapticFeedback.notificationOccurred('success');
+                } else {
+                    tg.HapticFeedback.notificationOccurred('error');
+                    APP_STATE.hearts--;
+                    document.getElementById('val-hearts').innerText = APP_STATE.hearts;
+                    document.getElementById('lesson-hearts-val').innerText = APP_STATE.hearts;
+                    saveState();
+                }
+            });
+
+            document.getElementById('feedback-btn').addEventListener('click', function () {
+                nextStep();
+            });
+
+            function nextStep() {
+                document.getElementById('feedback').classList.remove('active');
+
+                // Check for hearts depletion
+                if (APP_STATE.hearts <= 0) {
+                    lessonRoot.style.display = 'none';
+                    showModal('hearts');
+                    return;
+                }
+
+                APP_STATE.lessonStep++;
+                const steps = APP_STATE.isReviewMode ? APP_STATE.reviewSteps : APP_STATE.activeLesson.steps;
+
+                if (APP_STATE.lessonStep >= steps.length) {
+                    if (APP_STATE.isReviewMode) {
+                        APP_STATE.isReviewMode = false;
+                        APP_STATE.mistakes = []; // Mistakes cleared after review
+                        finishLesson();
+                    } else {
+                        finishLesson();
+                    }
+                } else {
+                    renderLessonStep();
+                }
+            }
+
+            function finishLesson() {
+                const timeSpent = Math.floor((Date.now() - APP_STATE.startTime) / 1000);
+                const total = APP_STATE.activeLesson.steps.length;
+                const accuracy = Math.max(0, Math.round(((total - APP_STATE.mistakes.length) / total) * 100));
+
+                // Update summary UI
+                document.getElementById('sum-time').innerText = `${Math.floor(timeSpent / 60).toString().padStart(2, '0')}:${(timeSpent % 60).toString().padStart(2, '0')}`;
+                document.getElementById('sum-accuracy').innerText = `${accuracy}%`;
+                document.getElementById('sum-xp').innerText = `+100`;
+
+                if (APP_STATE.mistakes.length > 0) {
+                    document.getElementById('sum-review-box').style.display = 'flex';
+                    document.getElementById('sum-mistakes-count').innerText = `Нужно исправить: ${APP_STATE.mistakes.length}`;
+                } else {
+                    document.getElementById('sum-review-box').style.display = 'none';
+                    launchConfetti();
+                }
+
+                APP_STATE.xp += 100;
+                if (!APP_STATE.completedLevels) APP_STATE.completedLevels = [];
+                if (!APP_STATE.completedLevels.includes(APP_STATE.lessonIndex)) {
+                    APP_STATE.completedLevels.push(APP_STATE.lessonIndex);
+                }
+                saveState();
+
+                document.getElementById('summary-screen').classList.add('active');
+                lessonRoot.style.display = 'none';
+                buildMap();
+                updateHUD();
+            }
+
+            window.closeSummary = () => {
+                document.getElementById('summary-screen').classList.remove('active');
+            };
+
+            function launchConfetti() {
+                for (let i = 0; i < 50; i++) {
+                    const c = document.createElement('div');
+                    c.className = 'confetti';
+                    c.style.left = Math.random() * 100 + 'vw';
+                    c.style.top = '-10px';
+                    c.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                    c.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    document.body.appendChild(c);
+
+                    const duration = 2 + Math.random() * 3;
+                    c.animate([
+                        { top: '-10px', transform: `rotate(0deg) translateX(0px)` },
+                        { top: '110vh', transform: `rotate(720deg) translateX(${Math.random() * 100 - 50}px)` }
+                    ], {
+                        duration: duration * 1000,
+                        easing: 'cubic-bezier(.37,0,.63,1)'
+                    });
+                    setTimeout(() => c.remove(), duration * 1000);
+                }
+            }
+
+            // --- RECOVERY TIMER ---
+            function startHeartTimer() {
+                const timerEl = document.getElementById('recovery-timer');
+                if (!timerEl) return;
+
+                setInterval(() => {
+                    const now = Date.now();
+                    const diff = (APP_STATE.lastHeartTick + 10800000) - now; // 3 hours
+                    if (diff <= 0) {
+                        timerEl.innerText = "ГОТОВО!";
+                        return;
+                    }
+                    const h = Math.floor(diff / 3600000);
+                    const m = Math.floor((diff % 3600000) / 60000);
+                    const s = Math.floor((diff % 60000) / 1000);
+                    timerEl.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                }, 1000);
+            }
+
+            // --- BINDINGS ---
+            document.getElementById('p-trigger').onclick = () => showModal('profile');
+            document.getElementById('hud-hearts').onclick = () => showModal('hearts');
+            document.getElementById('hud-streak').onclick = () => showModal('streak');
+            document.getElementById('modal-closer').onclick = () => modalEngine.classList.remove('active');
+            document.getElementById('exit-lesson').onclick = () => {
+                if (confirm("Вы уверены, что хотите выйти? Прогресс будет потерян.")) {
+                    lessonRoot.style.display = 'none';
+                }
+            };
+
+            window.claimTask = (id) => {
+                tg.HapticFeedback.notificationOccurred('success');
+                if (APP_STATE.hearts < 5) {
+                    APP_STATE.hearts++;
+                    updateHUD();
+                    saveState();
+                    tg.showAlert("Награда получена! +1 ❤️");
+                } else {
+                    tg.showAlert("У тебя и так полные жизни!");
+                }
+            };
+
+            window.buyHearts = () => {
+                tg.showAlert("Заглушка оплаты: Здесь будет вызов Invoice для покупки Stars.");
+            };
+
+            // Initialize Everything
+            loadState();
+            buildMap();
+            updateHUD();
+
+            function buildMap() {
+                mapTarget.innerHTML = '<div class="path-line"></div>';
+                const lessons = [
+                    { id: 1, title: 'Начало', icon: '🦉' },
+                    { id: 2, title: 'Telegram Stars', icon: '⭐' },
+                    { id: 3, title: 'Маркетплейс', icon: '🛒' },
+                    { id: 4, title: 'Лимитки', icon: '💎' },
+                    { id: 5, title: 'NFT Мир', icon: '🖼️' },
+                    { id: 6, title: 'Блокчейн TON', icon: '🌐' },
+                    { id: 7, title: 'Аукционы', icon: '🔨' },
+                    { id: 8, title: 'Фрагмент', icon: '🧩' },
+                    { id: 9, title: 'Коллекции', icon: '📁' },
+                    { id: 10, title: 'Минтинг', icon: '🔥' }
+                ];
+
+                lessons.forEach((l, idx) => {
+                    const node = document.createElement('div');
+                    node.className = 'node-container';
+
+                    let status = 'locked';
+                    if (APP_STATE.completedLevels?.includes(idx)) {
+                        status = 'completed';
+                    } else if (idx === 0 || APP_STATE.completedLevels?.includes(idx - 1)) {
+                        status = 'active';
+                    }
+
+                    node.innerHTML = `
+                    <div class="node-wrapper ${status}" onclick="handleNodeClick(${idx})">
+                        <div class="node-circle">${l.icon}</div>
+                        <div class="node-label">${l.title}</div>
+                    </div>
+                `;
+                    mapTarget.appendChild(node);
+                });
+            }
+
+        </script>
+</body>
+
+</html>
