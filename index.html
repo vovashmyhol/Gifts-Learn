@@ -793,6 +793,202 @@
                 opacity: 1;
             }
         }
+
+        /* --- GIFTLINGO PLUS STYLES --- */
+        .plus-banner {
+            background: linear-gradient(135deg, #1d4ed8 0%, #7e22ce 50%, #f59e0b 100%);
+            padding: 18px;
+            border-radius: 24px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(126, 34, 206, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plus-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: plusShine 4s infinite;
+        }
+
+        @keyframes plusShine {
+            0% {
+                transform: translateX(-100%) translateY(-100%);
+            }
+
+            100% {
+                transform: translateX(100%) translateY(100%);
+            }
+        }
+
+        .plus-banner-text h3 {
+            font-size: 18px;
+            font-weight: 900;
+            color: #fff;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .plus-banner-text p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 4px 0 0;
+            font-weight: 600;
+        }
+
+        .plus-badge-mini {
+            background: #fff;
+            color: #7e22ce;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-weight: 900;
+            font-size: 12px;
+        }
+
+        /* Feature Carousel */
+        .carousel-container {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .carousel-track {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        .carousel-track::-webkit-scrollbar {
+            display: none;
+            /* Chrome/Safari */
+        }
+
+        .carousel-slide {
+            flex: 0 0 100%;
+            scroll-snap-align: center;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .carousel-slide i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .carousel-slide h3 {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        .carousel-slide p {
+            font-size: 16px;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 25px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .dot.active {
+            background: #7e22ce;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        /* Verified Badge & Plus Ring */
+        .verified-icon {
+            width: 20px;
+            height: 20px;
+            margin-left: 6px;
+            vertical-align: middle;
+            filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.5));
+        }
+
+        .profile-trigger.plus-active {
+            border: 3px solid transparent;
+            background: linear-gradient(var(--bg), var(--bg)) padding-box,
+                linear-gradient(135deg, #1d4ed8, #7e22ce, #f59e0b) border-box;
+            animation: borderRotate 4s linear infinite;
+        }
+
+        .p-avatar-lg.plus-active {
+            border: 5px solid transparent;
+            background: linear-gradient(#111, #111) padding-box,
+                linear-gradient(135deg, #1d4ed8, #7e22ce, #f59e0b) border-box;
+        }
+
+        @keyframes borderRotate {
+            to {
+                filter: hue-rotate(360deg);
+            }
+        }
+
+        /* Mission Style */
+        .mission-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            border-radius: 24px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .mission-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--glass-thick);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .mission-info {
+            flex: 1;
+        }
+
+        .mission-info h4 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .mission-info p {
+            margin: 4px 0 0;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
     </style>
 </head>
 
@@ -902,6 +1098,7 @@
             tg.ready();
 
             const APP_STATE = {
+                isPlus: false,
                 hearts: 5,
                 maxHearts: 5,
                 xp: 0,
@@ -909,7 +1106,7 @@
                 level: 1,
                 stars: 0,
                 lastHeartTick: Date.now(),
-                inventory: { snowflakes: 0 },
+                inventory: { snowflakes: 0, plusEnabled: false },
                 completedLevels: [],
                 activeLesson: null,
                 lessonStep: 0,
@@ -917,10 +1114,10 @@
                 lessonIndex: 0,
                 isInTheory: false,
                 theoryStep: 0,
-                // Stats for summary
                 mistakes: [],
                 startTime: 0,
-                isReviewMode: false
+                isReviewMode: false,
+                claimedTasks: []
             };
 
             function saveState() {
@@ -940,6 +1137,7 @@
 
             // --- MAP GENERATOR (50 levels scale) ---
             function buildMap() {
+                mapTarget.innerHTML = '<div class="path-line"></div>';
                 const lessons = [
                     { id: 1, title: 'Начало', icon: '🦉', color: 'green' },
                     { id: 2, title: 'Telegram Stars', icon: '⭐' },
@@ -972,10 +1170,10 @@
             const VIEWS = {
                 profile: () => `
                 <div class="profile-head">
-                    <div class="p-avatar-lg">
+                    <div class="p-avatar-lg ${APP_STATE.isPlus ? 'plus-active' : ''}">
                         <img src="${tg.initDataUnsafe?.user?.photo_url || 'https://via.placeholder.com/150'}" alt="User">
                     </div>
-                    <h2>${tg.initDataUnsafe?.user?.first_name || 'Твой Профиль'}</h2>
+                    <h2>${tg.initDataUnsafe?.user?.first_name || 'Твой Профиль'}${APP_STATE.isPlus ? '<img src="галка.PNG" class="verified-icon" alt="Verified">' : ''}</h2>
                     <p class="p-username">@${tg.initDataUnsafe?.user?.username || 'user'}</p>
                 </div>
                 <div class="p-stats">
@@ -988,21 +1186,44 @@
                         <span class="p-stat-lbl">Дней 🔥</span>
                     </div>
                 </div>
-                <div class="task-list">
-                    <h3 class="section-title">Задания для ❤️</h3>
-                    <div class="task-item">
-                        <div class="task-info">
-                            <h4>Подпишись на GiftNews</h4>
-                            <p>Узнавай первым о лимитках</p>
-                        </div>
-                        <button class="reward-btn" onclick="claimTask(1)">+1 ❤️</button>
+                ${!APP_STATE.isPlus ? `
+                <div class="plus-banner" onclick="showModal('plusIntro')">
+                    <div class="plus-banner-text">
+                        <h3>GiftLingo Plus</h3>
+                        <p>Безлимитные жизни и бонусы</p>
                     </div>
-                    <div class="task-item">
-                        <div class="task-info">
-                            <h4>Вступи в TON Community</h4>
-                            <p>Основы блокчейна для всех</p>
+                    <div class="plus-badge-mini">ПОПРОБОВАТЬ</div>
+                </div>
+                ` : `
+                <div class="plus-banner" style="background:linear-gradient(135deg, #111, #333); border:1px solid #7e22ce;" onclick="showModal('plusIntro')">
+                    <div class="plus-banner-text">
+                        <h3>Активен Plus</h3>
+                        <p>У тебя безлимитные возможности</p>
+                    </div>
+                    <div class="plus-badge-mini" style="background:#7e22ce; color:#fff">УПРАВЛЯТЬ</div>
+                </div>
+                `}
+                <div class="task-list">
+                    <h3 class="section-title">Миссии для ❤️</h3>
+                    <div class="mission-card">
+                        <div class="mission-icon">📢</div>
+                        <div class="mission-info">
+                            <h4>GiftNews</h4>
+                            <p>Подпишись на новости</p>
                         </div>
-                        <button class="reward-btn" onclick="claimTask(2)">+1 ❤️</button>
+                        <button class="reward-btn" onclick="claimTask(1)" ${APP_STATE.claimedTasks?.includes(1) ? 'disabled style="opacity:0.5"' : ''}>
+                            ${APP_STATE.claimedTasks?.includes(1) ? '✅' : '+1 ❤️'}
+                        </button>
+                    </div>
+                    <div class="mission-card">
+                        <div class="mission-icon">💎</div>
+                        <div class="mission-info">
+                            <h4>TON Community</h4>
+                            <p>Вступи в сообщество</p>
+                        </div>
+                        <button class="reward-btn" onclick="claimTask(2)" ${APP_STATE.claimedTasks?.includes(2) ? 'disabled style="opacity:0.5"' : ''}>
+                            ${APP_STATE.claimedTasks?.includes(2) ? '✅' : '+1 ❤️'}
+                        </button>
                     </div>
                 </div>
             `,
@@ -1037,19 +1258,58 @@
                 levelMenu: (idx) => {
                     const l = LESSON_DATABASE[idx];
                     return `
-                <div style="text-align:center">
-                    <div class="node-circle" style="width:120px; height:120px; margin:0 auto 20px; font-size:50px; background:var(--accent-green); color:#000">${l.icon}</div>
-                    <h2 style="font-size:28px; margin-bottom:10px">${l.title}</h2>
-                    <p style="color:var(--text-dim); margin-bottom:30px">Изучи теорию и пройди тест, чтобы завершить уровень!</p>
-                    
-                    <button class="buy-action" style="background:#2c2c2e; color:white; margin-bottom:15px" onclick="startTheory(${idx})">
-                        📖 Изучить материал
-                    </button>
-                    <button class="buy-action" onclick="startTest(${idx})">
-                        ⚡ Пройти тест
-                    </button>
-                </div>
-                `;
+                    <div style="text-align:center">
+                        <div class="node-circle" style="width:120px; height:120px; margin:0 auto 20px; font-size:50px; background:var(--accent-green); color:#000">${l.icon}</div>
+                        <h2 style="font-size:28px; margin-bottom:10px">${l.title}</h2>
+                        <p style="color:var(--text-dim); margin-bottom:30px">Изучи теорию и пройди тест, чтобы завершить уровень!</p>
+                        
+                        <button class="buy-action" style="background:#2c2c2e; color:white; margin-bottom:15px" onclick="startTheory(${idx})">
+                            📖 Изучить материал
+                        </button>
+                        <button class="buy-action" onclick="startTest(${idx})">
+                            ⚡ Пройти тест
+                        </button>
+                    </div>
+                    `;
+                },
+                plusIntro: () => {
+                    const features = [
+                        { i: '♾️', t: 'Безлимитные жизни', d: 'Забывай об ошибках. Твои жизни никогда не закончатся.' },
+                        { i: '🎨', t: 'Эксклюзивный дизайн', d: 'Золотая рамка профиля и уникальная галочка верификации.' },
+                        { i: '👨‍💼', t: 'Личный менеджер', d: 'Персональная поддержка и ответы на любые вопросы прямо в чате.' },
+                        { i: '📂', t: 'Особые коллекции', d: 'Доступ к скрытым курсам и ранний доступ к новым лимиткам.' }
+                    ];
+                    return `
+                    <div class="plus-modal-view">
+                        <div class="carousel-container">
+                            <div class="carousel-track" id="plus-track" onscroll="updatePlusDots()">
+                                ${features.map(f => `
+                                    <div class="carousel-slide">
+                                        <div style="font-size:70px; margin-bottom:20px">${f.i}</div>
+                                        <h3>${f.t}</h3>
+                                        <p>${f.d}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="carousel-dots" id="plus-dots">
+                            <div class="dot active"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        
+                        <button class="buy-action" style="background:linear-gradient(135deg, #1d4ed8, #7e22ce); color:#fff; margin-top:30px; font-size:20px" onclick="togglePlus()">
+                            ${APP_STATE.isPlus ? 'ВЕРНУТЬ ОБЫЧНУЮ ВЕРСИЮ' : 'ПОДКЛЮЧИТЬ БЕСПЛАТНО'}
+                        </button>
+                        
+                        ${APP_STATE.isPlus ? `
+                            <button class="buy-action" style="background:var(--accent-blue); color:#fff; margin-top:10px" onclick="window.open('https://t.me/your_manager')">
+                                💬 СВЯЗАТЬСЯ С МЕНЕДЖЕРОМ
+                            </button>
+                        ` : ''}
+                    </div>
+                    `;
                 }
             };
 
@@ -1059,55 +1319,153 @@
                     title: "Начало",
                     icon: "🦉",
                     theory: [
-                        { t: "Добро пожаловать в мир подарков!", d: "Telegram подарки — это новая эра коллекционирования прямо в мессенджере. Это цифровые объекты, которые вы можете отправлять друзьям или выставлять в своем профиле." },
-                        { t: "Зачем они нужны?", d: "Подарки помогают подчеркнуть статус, отметить важное событие или просто сделать приятное. Самые редкие из них становятся частью истории Telegram." },
-                        { t: "Ограниченные серии", d: "Многие подарки выпускаются ограниченным тиражом (лимитки). Как только серия раскуплена, она больше никогда не появится в официальном магазине." },
-                        { t: "Блокчейн и NFT", d: "Некоторые подарки можно превратить в NFT на блокчейне TON (минтинг). Это делает их вашей полноценной собственностью, которую можно продать на маркетплейсе." }
+                        { t: "Добро пожаловать!", d: "Telegram подарки — это новая эра коллекционирования. Это цифровые объекты, которые можно дарить и выставлять в профиле." },
+                        { t: "Зачем они нужны?", d: "Подарки подчеркивают статус и помогают отметить важные события. Самые редкие становятся частью истории." }
                     ],
                     steps: [
-                        { q: "Что такое Telegram подарки?", opts: ["Цифровые коллекционки", "Обычные стикеры", "Просто деньги", "Ничего"], correct: 0, msg: "Это уникальные цифровые объекты!" },
-                        { q: "Где отображаются полученные подарки?", opts: ["В настройках", "В профиле пользователя", "В папке Избранное", "В облаке"], correct: 1, msg: "У каждого пользователя есть специальная вкладка в профиле." },
-                        { q: "Могут ли подарки закончиться?", opts: ["Нет, они бесконечны", "Да, если серия лимитированная", "Только по праздникам", "Если выключить интернет"], correct: 1, msg: "Лимитированные серии имеют строго ограниченный тираж." },
-                        { q: "Что происходит при 'минтинге' подарка?", opts: ["Он удаляется", "Он становится NFT", "Он меняет цвет", "Он становится бесплатным"], correct: 1, msg: "Минтинг привязывает ваш подарок к блокчейну TON." },
-                        { q: "Кто может видеть ваши подарки?", opts: ["Только вы", "Все пользователи (если не скрыто)", "Только администрация", "Ваши контакты"], correct: 1, msg: "По умолчанию профиль открыт для всех!" },
-                        { q: "Зачем нужны лимитированные подарки?", opts: ["Для красоты", "Для коллекционной ценности", "Чтобы потратить деньги", "Для спама"], correct: 1, msg: "Они имеют ценность из-за своей редкости." },
-                        { q: "Можно ли скрыть подарок из профиля?", opts: ["Да", "Нет", "Только через техподдержку", "Если он сломался"], correct: 0, msg: "Вы всегда контролируете приватность своего профиля." },
-                        { q: "Какая технология стоит за NFT подарками?", opts: ["Bitcoin", "Ethereum", "TON", "Solana"], correct: 2, msg: "Telegram неразрывно связан с блокчейном TON." },
-                        { q: "Как называются подарки, которые можно конвертировать?", opts: ["Обычные", "Конвертируемые", "NFT-совместимые", "Лимитированные"], correct: 3, msg: "Обычно именно лимитки имеют возможность минтинга." },
-                        { q: "Что повышает ценность подарка?", opts: ["Размер", "Порядковый номер и тираж", "Время отправки", "Имя отправителя"], correct: 1, msg: "Низкий серийный номер (например, #1/1000) ценится выше всего!" }
+                        { q: "Что такое Telegram подарки?", opts: ["Цифровые коллекционки", "Стикеры", "Деньги"], correct: 0 },
+                        { q: "Где они хранятся?", opts: ["В облаке", "В профиле", "В чате"], correct: 1 }
                     ]
                 },
                 {
-                    title: "Telegram Stars",
+                    title: "Stars",
                     icon: "⭐",
                     theory: [
-                        { t: "Что такое Stars?", d: "Stars — это внутренняя валюта Telegram, введенная для оплаты цифровых товаров и услуг в ботах и мини-аппах." },
-                        { t: "Зачем они нужны подаркам?", d: "Именно за Stars покупаются практически все официальные подарки в Telegram." },
-                        { t: "Как получить Stars?", d: "Пользователи могут купить Stars через встроенные покупки Apple/Google или через Fragment." },
-                        { t: "Вывод средств", d: "Разработчики и создатели контента могут обменивать полученные Stars на TON через платформу Fragment." }
+                        { t: "Что такое Stars?", d: "Stars — это внутренняя валюта для оплаты цифровых товаров в Telegram." }
                     ],
                     steps: [
-                        { q: "Для чего нужны Telegram Stars?", opts: ["Оплата физических товаров", "Оплата цифровых товаров", "Просто для красоты", "Для звонков"], correct: 1 },
-                        { q: "Где можно купить Stars выгоднее?", opts: ["В приложении", "На платформе Fragment", "В банке", "У перекупов"], correct: 1 },
-                        { q: "Кто создал Stars?", opts: ["Apple", "Telegram", "Google", "TON Foundation"], correct: 1 },
-                        { q: "В какую валюту можно конвертировать Stars на Fragment?", opts: ["Bitcoin", "USD", "TON", "ETH"], correct: 2 },
-                        { q: "Можно ли подарить Stars другу?", opts: ["Да", "Нет", "Только через бота", "Только 1000 штук"], correct: 0 },
-                        { q: "Как Stars влияют на ранжирование ботов?", opts: ["Никак", "Больше звезд — выше в поиске", "Только на рекламу", "Влияют на цвет"], correct: 1 },
-                        { q: "Есть ли срок годности у Stars?", opts: ["Да, год", "Нет, они бессрочны", "3 года", "До конца месяца"], correct: 1 },
-                        { q: "Минимальный пакет Stars для покупки?", opts: ["10", "50", "1", "100"], correct: 1 },
-                        { q: "Что такое 'Звездная пыль'?", opts: ["Мусор", "Мелкие остатки звезд", "Эффект при дарении", "Тип подарка"], correct: 2 },
-                        { q: "Можно ли оплатить Stars подписку Premium?", opts: ["Да", "Нет", "Только часть", "Только через подарок"], correct: 1 }
+                        { q: "Для чего нужны Stars?", opts: ["Оплата еды", "Цифровые товары", "Звонки"], correct: 1 }
+                    ]
+                },
+                {
+                    title: "Маркетплейс",
+                    icon: "🛒",
+                    theory: [
+                        { t: "Fragment", d: "Платформа для торговли именами и NFT-подарками." }
+                    ],
+                    steps: [
+                        { q: "Где торгуют именами?", opts: ["Avito", "Fragment", "Ozon"], correct: 1 }
+                    ]
+                },
+                {
+                    title: "NFT Мир",
+                    icon: "🖼️",
+                    theory: [
+                        { t: "Минтинг", d: "Процесс превращения обычного подарка в NFT на блокчейне TON." }
+                    ],
+                    steps: [
+                        { q: "Что такое минтинг?", opts: ["Удаление", "Создание NFT", "Обмен"], correct: 1 }
+                    ]
+                },
+                {
+                    title: "TON",
+                    icon: "🌐",
+                    theory: [
+                        { t: "The Open Network", d: "Блокчейн, на котором работают все NFT-сервисы Telegram." }
+                    ],
+                    steps: [
+                        { q: "Как называется блокчейн Telegram?", opts: ["SOL", "ETH", "TON"], correct: 2 }
                     ]
                 }
             ];
 
-            // --- CORE FUNCTIONS ---
+            // --- PERSISTENCE ---
+            function saveState() {
+                const stateToSave = {
+                    isPlus: APP_STATE.isPlus,
+                    hearts: APP_STATE.hearts,
+                    maxHearts: APP_STATE.maxHearts,
+                    xp: APP_STATE.xp,
+                    streak: APP_STATE.streak,
+                    level: APP_STATE.level,
+                    stars: APP_STATE.stars,
+                    lastHeartTick: APP_STATE.lastHeartTick,
+                    inventory: APP_STATE.inventory || { snowflakes: 0 },
+                    completedLevels: APP_STATE.completedLevels || [],
+                    claimedTasks: APP_STATE.claimedTasks || []
+                };
+                localStorage.setItem('giftLingoState', JSON.stringify(stateToSave));
+            }
+
+            function loadState() {
+                const saved = localStorage.getItem('giftLingoState');
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        // Merge saved state into APP_STATE
+                        Object.assign(APP_STATE, parsed);
+
+                        // Reset transient fields
+                        APP_STATE.activeLesson = null;
+                        APP_STATE.lessonStep = 0;
+                        APP_STATE.isInTheory = false;
+                        APP_STATE.theoryStep = 0;
+                        APP_STATE.mistakes = [];
+                        APP_STATE.isReviewMode = false;
+
+                        // Ensure defaults if missing
+                        if (!APP_STATE.inventory) APP_STATE.inventory = { snowflakes: 0 };
+                        if (!APP_STATE.completedLevels) APP_STATE.completedLevels = [];
+                        if (!APP_STATE.claimedTasks) APP_STATE.claimedTasks = [];
+                    } catch (e) {
+                        console.error("State load error", e);
+                    }
+                }
+            }
+
+            window.claimTask = (id) => {
+                if (APP_STATE.claimedTasks?.includes(id)) return;
+
+                tg.HapticFeedback.notificationOccurred('success');
+                APP_STATE.hearts = Math.min(APP_STATE.maxHearts, APP_STATE.hearts + 1);
+
+                if (!APP_STATE.claimedTasks) APP_STATE.claimedTasks = [];
+                APP_STATE.claimedTasks.push(id);
+                saveState();
+
+                tg.showAlert("Задание выполнено! +1 ❤️");
+                showModal('profile'); // Refresh UI
+                updateHUD();
+            };
+
             function updateHUD() {
-                document.getElementById('val-hearts').innerText = APP_STATE.hearts;
+                const heartsVal = APP_STATE.isPlus ? '∞' : APP_STATE.hearts;
+                document.getElementById('val-hearts').innerText = heartsVal;
                 document.getElementById('val-streak').innerText = APP_STATE.streak;
                 const avatar = tg.initDataUnsafe?.user?.photo_url || 'https://via.placeholder.com/150';
                 document.getElementById('tg-avatar').src = avatar;
+
+                // Plus visuals
+                const pTrigger = document.getElementById('p-trigger');
+                if (APP_STATE.isPlus) {
+                    pTrigger.classList.add('plus-active');
+                } else {
+                    pTrigger.classList.remove('plus-active');
+                }
             }
+
+            window.updatePlusDots = () => {
+                const track = document.getElementById('plus-track');
+                const scrollLeft = track.scrollLeft;
+                const width = track.offsetWidth;
+                const index = Math.round(scrollLeft / width);
+
+                document.querySelectorAll('.dot').forEach((d, i) => {
+                    d.classList.toggle('active', i === index);
+                });
+            };
+
+            window.togglePlus = () => {
+                APP_STATE.isPlus = !APP_STATE.isPlus;
+                if (APP_STATE.isPlus) {
+                    APP_STATE.hearts = Infinity;
+                } else {
+                    APP_STATE.hearts = 5;
+                }
+                tg.HapticFeedback.notificationOccurred('success');
+                modalEngine.classList.remove('active');
+                updateHUD();
+            };
 
             function showModal(viewKey, arg) {
                 tg.HapticFeedback.impactOccurred('medium');
@@ -1167,7 +1525,7 @@
             function renderTheoryStep() {
                 const step = APP_STATE.activeLesson.theory[APP_STATE.theoryStep];
                 const progress = (APP_STATE.theoryStep / APP_STATE.activeLesson.theory.length) * 100;
-                document.getElementById('lesson-progress').style.width = `${progress}%`;
+                document.getElementById('lesson-progress').style.width = `${progress}% `;
 
                 const container = document.getElementById('lesson-body-content');
                 container.innerHTML = `
@@ -1176,7 +1534,7 @@
                     <h2 class="q-title" style="margin-bottom:20px">${step.t}</h2>
                     <p style="font-size:18px; line-height:1.6; color:var(--text-dim); max-width:400px; margin:0 auto">${step.d}</p>
                 </div>
-            `;
+                `;
 
                 const btn = document.getElementById('lesson-btn');
                 btn.innerText = "ДАЛЕЕ";
@@ -1188,7 +1546,7 @@
                 const steps = APP_STATE.isReviewMode ? APP_STATE.reviewSteps : APP_STATE.activeLesson.steps;
                 const step = steps[APP_STATE.lessonStep];
                 const progress = (APP_STATE.lessonStep / steps.length) * 100;
-                document.getElementById('lesson-progress').style.width = `${progress}%`;
+                document.getElementById('lesson-progress').style.width = `${progress}% `;
 
                 const container = document.getElementById('lesson-body-content');
                 container.innerHTML = `
@@ -1202,7 +1560,7 @@
                         `).join('')}
                     </div>
                 </div>
-            `;
+                `;
 
                 const btn = document.getElementById('lesson-btn');
                 btn.innerText = "Проверить";
@@ -1309,7 +1667,7 @@
 
                 if (APP_STATE.mistakes.length > 0) {
                     document.getElementById('sum-review-box').style.display = 'flex';
-                    document.getElementById('sum-mistakes-count').innerText = `Нужно исправить: ${APP_STATE.mistakes.length}`;
+                    document.getElementById('sum-mistakes-count').innerText = `Нужно исправить: ${APP_STATE.mistakes.length} `;
                 } else {
                     document.getElementById('sum-review-box').style.display = 'none';
                     launchConfetti();
@@ -1354,93 +1712,74 @@
                 }
             }
 
-            // --- RECOVERY TIMER ---
+            window.buyHearts = () => {
+                tg.showConfirm("Купить 5 сердец за 50 ⭐?", (confirm) => {
+                    if (confirm) {
+                        APP_STATE.hearts = 5;
+                        tg.HapticFeedback.notificationOccurred('success');
+                        modalEngine.classList.remove('active');
+                        updateHUD();
+                    }
+                });
+            };
+
+            window.buySnowflake = () => {
+                tg.showConfirm("Купить заморозку за 25 ⭐?", (confirm) => {
+                    if (confirm) {
+                        APP_STATE.inventory.snowflakes++;
+                        tg.HapticFeedback.notificationOccurred('success');
+                        modalEngine.classList.remove('active');
+                        updateHUD();
+                    }
+                });
+            };
+
             function startHeartTimer() {
                 const timerEl = document.getElementById('recovery-timer');
                 if (!timerEl) return;
-
                 setInterval(() => {
                     const now = Date.now();
-                    const diff = (APP_STATE.lastHeartTick + 10800000) - now; // 3 hours
-                    if (diff <= 0) {
-                        timerEl.innerText = "ГОТОВО!";
-                        return;
-                    }
+                    const diff = 3 * 3600 * 1000 - (now - APP_STATE.lastHeartTick) % (3 * 3600 * 1000);
                     const h = Math.floor(diff / 3600000);
                     const m = Math.floor((diff % 3600000) / 60000);
                     const s = Math.floor((diff % 60000) / 1000);
                     timerEl.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+                    if (diff < 1000 && APP_STATE.hearts < APP_STATE.maxHearts && !APP_STATE.isPlus) {
+                        APP_STATE.hearts++;
+                        updateHUD();
+                    }
                 }, 1000);
             }
 
-            // --- BINDINGS ---
-            document.getElementById('p-trigger').onclick = () => showModal('profile');
-            document.getElementById('hud-hearts').onclick = () => showModal('hearts');
-            document.getElementById('hud-streak').onclick = () => showModal('streak');
-            document.getElementById('modal-closer').onclick = () => modalEngine.classList.remove('active');
+            // Init
+            window.onload = () => {
+                loadState();
+                buildMap();
+                updateHUD();
+            };
+
+            document.getElementById('modal-closer').onclick = () => {
+                modalEngine.classList.remove('active');
+            };
+
+            document.getElementById('p-trigger').onclick = () => {
+                showModal('profile');
+            };
+
+            document.getElementById('hud-hearts').onclick = () => {
+                showModal('hearts');
+            };
+
+            document.getElementById('hud-streak').onclick = () => {
+                showModal('streak');
+            };
+
             document.getElementById('exit-lesson').onclick = () => {
-                if (confirm("Вы уверены, что хотите выйти? Прогресс будет потерян.")) {
-                    lessonRoot.style.display = 'none';
-                }
-            };
-
-            window.claimTask = (id) => {
-                tg.HapticFeedback.notificationOccurred('success');
-                if (APP_STATE.hearts < 5) {
-                    APP_STATE.hearts++;
-                    updateHUD();
-                    saveState();
-                    tg.showAlert("Награда получена! +1 ❤️");
-                } else {
-                    tg.showAlert("У тебя и так полные жизни!");
-                }
-            };
-
-            window.buyHearts = () => {
-                tg.showAlert("Заглушка оплаты: Здесь будет вызов Invoice для покупки Stars.");
-            };
-
-            // Initialize Everything
-            loadState();
-            buildMap();
-            updateHUD();
-
-            function buildMap() {
-                mapTarget.innerHTML = '<div class="path-line"></div>';
-                const lessons = [
-                    { id: 1, title: 'Начало', icon: '🦉' },
-                    { id: 2, title: 'Telegram Stars', icon: '⭐' },
-                    { id: 3, title: 'Маркетплейс', icon: '🛒' },
-                    { id: 4, title: 'Лимитки', icon: '💎' },
-                    { id: 5, title: 'NFT Мир', icon: '🖼️' },
-                    { id: 6, title: 'Блокчейн TON', icon: '🌐' },
-                    { id: 7, title: 'Аукционы', icon: '🔨' },
-                    { id: 8, title: 'Фрагмент', icon: '🧩' },
-                    { id: 9, title: 'Коллекции', icon: '📁' },
-                    { id: 10, title: 'Минтинг', icon: '🔥' }
-                ];
-
-                lessons.forEach((l, idx) => {
-                    const node = document.createElement('div');
-                    node.className = 'node-container';
-
-                    let status = 'locked';
-                    if (APP_STATE.completedLevels?.includes(idx)) {
-                        status = 'completed';
-                    } else if (idx === 0 || APP_STATE.completedLevels?.includes(idx - 1)) {
-                        status = 'active';
-                    }
-
-                    node.innerHTML = `
-                    <div class="node-wrapper ${status}" onclick="handleNodeClick(${idx})">
-                        <div class="node-circle">${l.icon}</div>
-                        <div class="node-label">${l.title}</div>
-                    </div>
-                `;
-                    mapTarget.appendChild(node);
+                tg.showConfirm("Вы уверены, что хотите выйти? Прогресс будет потерян.", (ok) => {
+                    if (ok) lessonRoot.style.display = 'none';
                 });
-            }
-
+            };
         </script>
 </body>
 
