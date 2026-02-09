@@ -796,32 +796,17 @@
     </style>
 </head>
 
-<body style="overflow: hidden;"> <!-- Lock scroll during load -->
-    <!-- Loading Screen -->
-    <div id="loading-screen">
-        <div class="loader-content">
-            <span class="loader-logo">🎁</span>
-            <div class="loader-spinner"></div>
-            <div class="loader-text">Gifts Learn</div>
-        </div>
-    </div>
-
+<body>
     <div class="ambient-glow"></div>
 
     <!-- HUD -->
     <header class="hud">
         <div class="hud-group">
             <div class="hud-badge fire-badge" id="hud-streak">
-                <span>🔥</span> <span id="val-streak">5</span>
-            </div>
-            <div class="hud-badge snowflake-badge">
-                <span>❄️</span> <span>2</span>
+                <span>🔥</span> <span id="val-streak">0</span>
             </div>
         </div>
         <div class="hud-group">
-            <div class="hud-badge star-badge">
-                <span>⭐</span> <span id="val-stars">150</span>
-            </div>
             <div class="hud-badge heart-badge" id="hud-hearts">
                 <span>❤️</span> <span id="val-hearts">5</span>
             </div>
@@ -919,12 +904,12 @@
             const APP_STATE = {
                 hearts: 5,
                 maxHearts: 5,
-                xp: 2450,
-                streak: 5,
-                level: 12,
-                stars: 120,
+                xp: 0,
+                streak: 0,
+                level: 1,
+                stars: 0,
                 lastHeartTick: Date.now(),
-                inventory: { snowflakes: 2 },
+                inventory: { snowflakes: 0 },
                 completedLevels: [],
                 activeLesson: null,
                 lessonStep: 0,
@@ -1120,7 +1105,6 @@
             function updateHUD() {
                 document.getElementById('val-hearts').innerText = APP_STATE.hearts;
                 document.getElementById('val-streak').innerText = APP_STATE.streak;
-                document.getElementById('val-stars').innerText = APP_STATE.stars;
                 const avatar = tg.initDataUnsafe?.user?.photo_url || 'https://via.placeholder.com/150';
                 document.getElementById('tg-avatar').src = avatar;
             }
