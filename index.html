@@ -346,6 +346,53 @@
         .profile-head {
             text-align: center;
             margin-top: 20px;
+            padding: 25px;
+            border-radius: 25px;
+            transition: var(--transition);
+        }
+
+        .profile-head.plus-active {
+            background: linear-gradient(165deg, #1b2847 0%, #2c4170 50%, #1a2847 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-head.plus-active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                url('ФонЗвезда.webp'), url('ФонЗвезда.webp'),
+                url('ФонЗвезда.webp'), url('ФонЗвезда.webp'),
+                url('ФонЗвезда.webp'), url('ФонЗвезда.webp'),
+                url('ФонЗвезда.webp'), url('ФонЗвезда.webp'),
+                url('ФонЗвезда.webp'), url('ФонЗвезда.webp');
+            background-repeat: no-repeat;
+            background-size: 40px 40px;
+            background-position:
+                25% 10%, 75% 10%,
+                10% 35%, 50% 35%, 90% 35%,
+                25% 65%, 75% 65%,
+                10% 90%, 50% 90%, 90% 90%;
+            opacity: 0.12;
+            mix-blend-mode: screen;
+            mask-image: radial-gradient(circle, black 75%, transparent 100%);
+            -webkit-mask-image: radial-gradient(circle, black 75%, transparent 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .profile-head.plus-active>* {
+            position: relative;
+            z-index: 1;
         }
 
         .p-avatar-lg {
@@ -373,31 +420,45 @@
         .p-stats {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
             margin: 30px 0;
         }
 
         .p-stat-card {
             background: var(--glass);
             border: 1px solid var(--glass-border);
-            padding: 16px;
-            border-radius: 20px;
-            min-width: 110px;
+            padding: 12px 8px;
+            border-radius: 18px;
+            flex: 1;
+            max-width: 100px;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
+            transition: var(--transition);
+        }
+
+        .p-stat-card:hover {
+            background: var(--glass-thick);
+            transform: translateY(-2px);
         }
 
         .p-stat-val {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 900;
             display: block;
+            margin-bottom: 2px;
         }
 
         .p-stat-lbl {
-            font-size: 12px;
+            font-size: 9px;
             font-weight: 700;
             color: var(--text-dim);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
         .task-list {
@@ -484,19 +545,26 @@
 
         .buy-action {
             width: 100%;
-            padding: 22px;
+            padding: 16px 20px;
             background: var(--accent-green);
             color: #000;
-            border-radius: 20px;
-            font-size: 18px;
-            font-weight: 900;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             border: none;
-            margin-top: 20px;
+            margin-top: 15px;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .buy-action:active {
+            transform: scale(0.97);
         }
 
         /* --- LESSON ENGINE UI --- */
@@ -1169,7 +1237,7 @@
             // --- MODAL VIEWS ---
             const VIEWS = {
                 profile: () => `
-                <div class="profile-head">
+                <div class="profile-head ${APP_STATE.isPlus ? 'plus-active' : ''}">
                     <div class="p-avatar-lg ${APP_STATE.isPlus ? 'plus-active' : ''}">
                         <img src="${tg.initDataUnsafe?.user?.photo_url || 'https://via.placeholder.com/150'}" alt="User">
                     </div>
@@ -1299,13 +1367,13 @@
                             <div class="dot"></div>
                         </div>
                         
-                        <button class="buy-action" style="background:linear-gradient(135deg, #1d4ed8, #7e22ce); color:#fff; margin-top:30px; font-size:20px" onclick="togglePlus()">
-                            ${APP_STATE.isPlus ? 'ВЕРНУТЬ ОБЫЧНУЮ ВЕРСИЮ' : 'ПОДКЛЮЧИТЬ БЕСПЛАТНО'}
+                        <button class="buy-action" style="background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.6); margin-top:30px; font-size:12px; height:50px; border:1px solid rgba(255,255,255,0.1)" onclick="togglePlus()">
+                            ${APP_STATE.isPlus ? 'Вернуть обычную версию' : 'ПОДКЛЮЧИТЬ БЕСПЛАТНО'}
                         </button>
                         
                         ${APP_STATE.isPlus ? `
-                            <button class="buy-action" style="background:var(--accent-blue); color:#fff; margin-top:10px" onclick="window.open('https://t.me/your_manager')">
-                                💬 СВЯЗАТЬСЯ С МЕНЕДЖЕРОМ
+                            <button class="buy-action" style="background:var(--accent-blue); color:#fff; margin-top:10px; font-size:13px; height:50px" onclick="window.open('https://t.me/your_manager')">
+                                💬 Менеджер проекта
                             </button>
                         ` : ''}
                     </div>
@@ -1371,46 +1439,12 @@
 
             // --- PERSISTENCE ---
             function saveState() {
-                const stateToSave = {
-                    isPlus: APP_STATE.isPlus,
-                    hearts: APP_STATE.hearts,
-                    maxHearts: APP_STATE.maxHearts,
-                    xp: APP_STATE.xp,
-                    streak: APP_STATE.streak,
-                    level: APP_STATE.level,
-                    stars: APP_STATE.stars,
-                    lastHeartTick: APP_STATE.lastHeartTick,
-                    inventory: APP_STATE.inventory || { snowflakes: 0 },
-                    completedLevels: APP_STATE.completedLevels || [],
-                    claimedTasks: APP_STATE.claimedTasks || []
-                };
-                localStorage.setItem('giftLingoState', JSON.stringify(stateToSave));
+                // Persistence removed per user request
             }
 
             function loadState() {
-                const saved = localStorage.getItem('giftLingoState');
-                if (saved) {
-                    try {
-                        const parsed = JSON.parse(saved);
-                        // Merge saved state into APP_STATE
-                        Object.assign(APP_STATE, parsed);
-
-                        // Reset transient fields
-                        APP_STATE.activeLesson = null;
-                        APP_STATE.lessonStep = 0;
-                        APP_STATE.isInTheory = false;
-                        APP_STATE.theoryStep = 0;
-                        APP_STATE.mistakes = [];
-                        APP_STATE.isReviewMode = false;
-
-                        // Ensure defaults if missing
-                        if (!APP_STATE.inventory) APP_STATE.inventory = { snowflakes: 0 };
-                        if (!APP_STATE.completedLevels) APP_STATE.completedLevels = [];
-                        if (!APP_STATE.claimedTasks) APP_STATE.claimedTasks = [];
-                    } catch (e) {
-                        console.error("State load error", e);
-                    }
-                }
+                // Persistence removed per user request
+                APP_STATE.lastHeartTick = Date.now();
             }
 
             window.claimTask = (id) => {

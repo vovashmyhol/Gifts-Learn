@@ -110,7 +110,7 @@ function startLesson() {
 function renderQuestion() {
     const qData = lessonData[state.currentLessonStep];
     const content = document.getElementById('lesson-content');
-    
+
     let optionsHtml = '';
     qData.options.forEach((opt, idx) => {
         optionsHtml += `<div class="option-card" onclick="selectOption(${idx})">${opt}</div>`;
@@ -122,7 +122,7 @@ function renderQuestion() {
             ${optionsHtml}
         </div>
     `;
-    
+
     document.getElementById('check-btn').disabled = true;
     document.getElementById('check-btn').classList.remove('active');
 }
@@ -132,7 +132,7 @@ window.selectOption = (idx) => {
     const cards = document.querySelectorAll('.option-card');
     cards.forEach(c => c.classList.remove('selected'));
     cards[idx].classList.add('selected');
-    
+
     const btn = document.getElementById('check-btn');
     btn.disabled = false;
     btn.classList.add('active');
@@ -142,7 +142,7 @@ window.selectOption = (idx) => {
 document.getElementById('check-btn').addEventListener('click', () => {
     const qData = lessonData[state.currentLessonStep];
     const isCorrect = state.selectedIdx === qData.correct;
-    
+
     if (isCorrect) {
         tg.HapticFeedback.notificationOccurred('success');
         state.currentLessonStep++;
@@ -211,4 +211,3 @@ document.head.appendChild(lessonStyles);
 // Initial Load
 generateMap();
 updateHeartsUI();
-`;
