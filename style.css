@@ -1,325 +1,144 @@
 :root {
-    --bg-color: #0c0d10;
-    --primary-green: #2ecc71;
-    --primary-blue: #3498db;
-    --glass-bg: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --text-white: #ffffff;
-    --text-muted: #8e8e93;
-    --red: #ff3b30;
-    --orange: #ff9500;
+    /* Telegram Dark Theme Colors */
+    --bg-color: #1c1c1d;
+    --secondary-bg-color: #2c2c2e;
+    --text-color: #ffffff;
+    --hint-color: #999999;
+    --accent-color: #248bfe;
+    --header-height: 60px;
 }
 
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     -webkit-tap-highlight-color: transparent;
 }
 
 body {
     background-color: var(--bg-color);
-    color: var(--text-white);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    overflow: hidden;
-    height: 100vh;
-    user-select: none;
+    color: var(--text-color);
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
-/* HUD */
-.hud {
+/* Header Styles */
+.main-header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
+    height: 120px;
     display: flex;
     justify-content: space-between;
-    padding: 16px 20px;
-    background: linear-gradient(to bottom, var(--bg-color) 0%, transparent 100%);
+    align-items: center;
+    padding: 10px 20px 60px 20px; /* Добавил 10px сверху для отступа от самого верха */
+    background: linear-gradient(to bottom, 
+        var(--bg-color) 0%, 
+        rgba(28, 28, 29, 0.95) 40%, 
+        rgba(28, 28, 29, 0.3) 80%, 
+        transparent 100%
+    );
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    /* Маска, которая заставляет САМ блюр затухать постепенно */
+    mask-image: linear-gradient(to bottom, black 40%, rgba(0, 0, 0, 0.5) 70%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 40%, rgba(0, 0, 0, 0.5) 70%, transparent 100%);
     z-index: 100;
+    pointer-events: none;
 }
 
-.streak-badge,
-.hearts-badge {
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-border);
-    padding: 8px 16px;
-    border-radius: 20px;
+.header-item {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-weight: bold;
-    font-size: 18px;
-    cursor: pointer;
+    font-weight: 700;
+    font-size: 16px;
+    /* iOS 26 Style: Gradient Border */
+    background: linear-gradient(var(--secondary-bg-color), var(--secondary-bg-color)) padding-box,
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.02)) border-box;
+    border: 0.5px solid transparent;
+    padding: 6px 12px;
+    border-radius: 20px;
+    opacity: 0.8;
+    pointer-events: auto;
+    box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.1), 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.fire-icon {
-    color: var(--orange);
+.header-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
 }
 
-.heart-icon {
-    color: var(--red);
-}
-
-/* Map Container */
-.map-container {
-    height: 100vh;
-    overflow-y: auto;
-    padding: 100px 0 150px 0;
-    scrollbar-width: none;
-}
-
-.map-container::-webkit-scrollbar {
-    display: none;
-}
-
-.map-scroll {
+/* Content Layout */
+.content {
+    margin-top: 100px; /* Еще больше увеличил отступ от бара */
+    padding: 16px;
     display: flex;
-    flex-direction: column-reverse;
-    /* For upward progression like Duolingo */
-    align-items: center;
-    gap: 60px;
-    padding: 40px 0;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-/* Map Nodes */
-.node {
+/* Banner Blocks */
+.banner-block {
     position: relative;
-    width: 80px;
-    height: 80px;
-    background: var(--glass-bg);
-    border: 4px solid var(--glass-border);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 32px;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 24px;
+    overflow: hidden;
     cursor: pointer;
-    transition: transform 0.2s, background 0.3s;
+    /* iOS 26 Style: Gradient Border */
+    background: linear-gradient(var(--secondary-bg-color), var(--secondary-bg-color)) padding-box,
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05)) border-box;
+    border: 0.5px solid transparent;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
-.node.active {
-    background: var(--primary-green);
-    border-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 0 20px rgba(46, 204, 113, 0.4);
-    transform: scale(1.1);
+.banner-block:active {
+    transform: scale(0.97) translateY(2px);
 }
 
-.node.active:active {
-    transform: scale(1.05);
-}
-
-.node-label {
-    position: absolute;
-    bottom: -30px;
-    white-space: nowrap;
-    font-weight: bold;
-    font-size: 14px;
-    background: var(--glass-bg);
-    padding: 4px 12px;
-    border-radius: 10px;
-    backdrop-filter: blur(5px);
-}
-
-/* Zig-Zag positions */
-.node:nth-child(4n+1) {
-    transform: translateX(40px);
-}
-
-.node:nth-child(4n+2) {
-    transform: translateX(0);
-}
-
-.node:nth-child(4n+3) {
-    transform: translateX(-40px);
-}
-
-.node:nth-child(4n+4) {
-    transform: translateX(0);
-}
-
-/* Profile Trigger */
-.profile-trigger {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    z-index: 200;
-}
-
-.avatar-wrapper {
-    width: 65px;
-    height: 65px;
-    border-radius: 50%;
-    border: 3px solid var(--primary-blue);
-    padding: 3px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(5px);
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-}
-
-.avatar-wrapper img {
+.banner-placeholder {
     width: 100%;
     height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
+    background: linear-gradient(135deg, #2c2c2e 0%, #1c1c1d 100%);
 }
 
-/* Modals */
-.modal-overlay {
-    position: fixed;
+.banner-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+    z-index: 2;
+}
+
+.banner-overlay h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.banner-overlay p {
+    font-size: 14px;
+    color: var(--hint-color);
+}
+
+/* Premium Effects */
+.banner-block::after {
+    content: '';
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(8px);
-    display: none;
-    z-index: 1000;
-    align-items: flex-end;
-}
-
-.modal {
-    background: #1c1c1e;
-    width: 100%;
-    border-radius: 30px 30px 0 0;
-    padding: 30px 20px;
-    transform: translateY(100%);
-    transition: transform 0.3s ease-out;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.modal-overlay.show {
-    display: flex;
-}
-
-.modal-overlay.show .modal {
-    transform: translateY(0);
-}
-
-.close-btn {
-    background: none;
-    border: none;
-    color: var(--text-white);
-    font-size: 30px;
-    cursor: pointer;
-}
-
-/* Profile Modal Details */
-.profile-info {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.profile-avatar-large {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    border: 4px solid var(--primary-blue);
-    margin: 0 auto 15px;
-}
-
-.profile-avatar-large img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-}
-
-.stats-row {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    margin-top: 20px;
-}
-
-.stat-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.stat-label {
-    font-size: 14px;
-    color: var(--text-muted);
-}
-
-.stat-value {
-    font-size: 24px;
-    font-weight: bold;
-}
-
-/* Tasks */
-.task-card {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 15px;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.task-btn {
-    background: var(--primary-green);
-    border: none;
-    color: black;
-    font-weight: bold;
-    padding: 8px 16px;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-/* Lesson UI */
-.lesson-modal {
-    height: 100vh;
-    border-radius: 0;
-    display: flex;
-    flex-direction: column;
-}
-
-.progress-bar-bg {
-    flex: 1;
-    height: 12px;
-    background: #3a3a3c;
-    border-radius: 10px;
-    margin: 0 15px;
-    overflow: hidden;
-}
-
-.progress-bar-fill {
-    width: 10%;
-    height: 100%;
-    background: var(--primary-green);
-    transition: width 0.3s;
-}
-
-.lesson-content {
-    flex: 1;
-    padding: 40px 10px;
-    text-align: center;
-}
-
-.lesson-footer {
-    padding: 20px;
-    border-top: 2px solid #3a3a3c;
-}
-
-.check-btn {
-    width: 100%;
-    padding: 18px;
-    font-size: 18px;
-    font-weight: bold;
-    border: none;
-    border-radius: 18px;
-    background: #3a3a3c;
-    color: #666;
-    transition: 0.3s;
-}
-
-.check-btn.active {
-    background: var(--primary-green);
-    color: black;
+    background: radial-gradient(circle at top left, rgba(255,255,255,0.05) 0%, transparent 70%);
+    pointer-events: none;
 }
