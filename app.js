@@ -7,6 +7,9 @@ tg.ready();
 tg.setHeaderColor('#1c1c1d');
 tg.setBackgroundColor('#1c1c1d');
 
+// Отключаем вертикальные свайпы, чтобы приложение не закрывалось при оттягивании вниз
+tg.disableVerticalSwipes();
+
 // Обработка кликов по баннерам
 document.getElementById('education-engine').addEventListener('click', () => {
     tg.HapticFeedback.impactOccurred('medium');
