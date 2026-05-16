@@ -171,6 +171,10 @@ let currentQueueIndex = 0;
 let selectedAnswer = null;
 let isManualMode = false;
 
+// Статистика
+let lessonStartTime = 0;
+let totalMistakes = 0;
+
 // Элементы
 const mainHeader = document.querySelector('.main-header');
 const mainMenu = document.getElementById('main-menu');
@@ -184,6 +188,7 @@ const loadingScreen = document.getElementById('loading-screen');
 const modalOverlay = document.getElementById('modal-overlay');
 const learnModal = document.getElementById('learn-modal');
 const reviewModal = document.getElementById('review-modal');
+const finalModal = document.getElementById('final-modal');
 const quizContainer = document.getElementById('quiz-container');
 
 // ─── ЗАГРУЗКА ────────────────────────────────────────────────────────────────
@@ -225,6 +230,9 @@ async function startLesson() {
     isRepetitionPhase = false;
     currentQueueIndex = 0;
     
+    lessonStartTime = Date.now();
+    totalMistakes = 0;
+    
     document.getElementById('repetition-badge').classList.add('hidden');
 
     selectedAnswer = null;
@@ -247,16 +255,8 @@ function exitLesson() {
 function renderQuestion() {
     let currentQueue = isRepetitionPhase ? mistakesQueue : questionQueue;
 
-    if (currentQueueIndex >= currentQueue.length) {
-        if (!isRepetitionPhase && mistakesQueue.length > 0) {
-            // Переход к повторению
-            showReviewModal();
-            return;
-        }
-        // Урок полностью завершён
-        exitLesson();
-        return;
-    }
+    // На всякий случай защита
+    if (currentQueueIndex >= currentQueue.length) return;
 
     const q = currentQueue[currentQueueIndex];
     const total = currentQueue.length;
@@ -306,9 +306,11 @@ function selectOption(btn) {
 function checkAnswer() {
     if (!selectedAnswer) return;
 
+    let currentQueue = isRepetitionPhase ? mistakesQueue : questionQueue;
+    if (currentQueueIndex >= currentQueue.length) return; // Защита от двойного клика в конце урока
+
     tg.HapticFeedback.impactOccurred('medium');
 
-    let currentQueue = isRepetitionPhase ? mistakesQueue : questionQueue;
     const q = currentQueue[currentQueueIndex];
     const isCorrect = selectedAnswer === q.correct;
 
@@ -320,6 +322,7 @@ function checkAnswer() {
             if (btn.innerText === selectedAnswer) btn.classList.add('correct');
         });
         checkBtn.classList.add('hidden');
+        selectedAnswer = null; // Сбрасываем выбранный ответ
         
         // Быстрый переход без модального окна
         setTimeout(() => {
@@ -341,6 +344,8 @@ function showLearnModal(q) {
 
     checkBtn.classList.add('hidden');
     selectedAnswer = null;
+
+    totalMistakes++;
 
     // Добавляем вопрос в очередь для повтора
     mistakesQueue.push(q);
@@ -376,13 +381,54 @@ document.getElementById('learned-btn').addEventListener('click', () => {
     continueLesson();
 });
 
+// ─── ИТОГОВОЕ ОКНО ───────────────────────────────────────────────────────────
+
+function showFinalModal() {
+    tg.HapticFeedback.notificationOccurred('success');
+    
+    const timeTaken = Math.floor((Date.now() - lessonStartTime) / 1000);
+    const minutes = Math.floor(timeTaken / 60).toString().padStart(2, '0');
+    const seconds = (timeTaken % 60).toString().padStart(2, '0');
+    
+    document.getElementById('final-time').innerText = `${minutes}:${seconds}`;
+    document.getElementById('final-mistakes').innerText = totalMistakes;
+    
+    let earnedPoints = Math.max(5, 15 - totalMistakes);
+    document.getElementById('final-points').innerText = `+${earnedPoints}`;
+    
+    const pointsEl = document.querySelector('.streaks .count');
+    pointsEl.innerText = parseInt(pointsEl.innerText) + earnedPoints;
+    
+    finalModal.classList.add('active');
+}
+
+document.getElementById('finish-lesson-btn').addEventListener('click', () => {
+    finalModal.classList.remove('active');
+    exitLesson();
+});
+
 // ─── ПРОДОЛЖИТЬ ──────────────────────────────────────────────────────────────
 
 function continueLesson() {
     tg.HapticFeedback.impactOccurred('light');
 
     currentQueueIndex++;
-    slideToNext();
+    
+    let currentQueue = isRepetitionPhase ? mistakesQueue : questionQueue;
+
+    if (currentQueueIndex >= currentQueue.length) {
+        // Очередь закончилась
+        if (!isRepetitionPhase && mistakesQueue.length > 0) {
+            // Переход к повторению (показываем модалку без слайда)
+            showReviewModal();
+        } else {
+            // Урок полностью завершён
+            showFinalModal();
+        }
+    } else {
+        // Есть следующий вопрос — делаем анимацию перехода
+        slideToNext();
+    }
 }
 
 // ─── АНИМАЦИЯ ПЕРЕХОДА ───────────────────────────────────────────────────────

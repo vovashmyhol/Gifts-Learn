@@ -80,6 +80,39 @@
         <button id="start-review-btn" class="primary-btn review-btn">Приступить</button>
     </div>
 
+    <!-- Final Results Modal (Lesson Complete) -->
+    <div id="final-modal" class="final-modal">
+        <h2 class="final-title">Урок завершен!</h2>
+        
+        <div class="final-lottie">
+            <lottie-player 
+                src="https://raw.githubusercontent.com/vovashmyhol/Gifts-Learn/refs/heads/main/final.json"
+                background="transparent"
+                speed="1"
+                style="width: 200px; height: 200px;"
+                loop
+                autoplay>
+            </lottie-player>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-box">
+                <span class="stat-label">Время</span>
+                <span class="stat-value" id="final-time">00:00</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Ошибки</span>
+                <span class="stat-value" id="final-mistakes" style="color: var(--error-color);">0</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Очки</span>
+                <span class="stat-value" id="final-points" style="color: #ff9f0a;">+15</span>
+            </div>
+        </div>
+
+        <button id="finish-lesson-btn" class="primary-btn">Отлично</button>
+    </div>
+
     <!-- Main Header -->
     <header class="main-header">
         <div class="header-item streaks">
