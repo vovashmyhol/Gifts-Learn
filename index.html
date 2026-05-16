@@ -6,8 +6,81 @@
     <title>Gifts Learn</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 </head>
 <body class="dark-theme">
+
+    <!-- Loading Screen (uses .active to show, not .hidden) -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="lottie-container">
+                <lottie-player 
+                    src="https://raw.githubusercontent.com/vovashmyhol/Gifts-Learn/refs/heads/main/load.json" 
+                    background="transparent" 
+                    speed="1" 
+                    style="width: 200px; height: 200px;" 
+                    loop 
+                    autoplay>
+                </lottie-player>
+            </div>
+            <div class="loading-text">
+                <span style="--i:1">L</span>
+                <span style="--i:2">O</span>
+                <span style="--i:3">A</span>
+                <span style="--i:4">D</span>
+                <span style="--i:5">I</span>
+                <span style="--i:6">N</span>
+                <span style="--i:7">G</span>
+                <span style="--i:8">.</span>
+                <span style="--i:9">.</span>
+                <span style="--i:10">.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay"></div>
+
+    <!-- Success Bottom Sheet Modal -->
+    <div id="success-modal" class="success-modal">
+        <div class="success-handle"></div>
+        <div class="success-lottie">
+            <lottie-player 
+                src="https://raw.githubusercontent.com/vovashmyhol/Gifts-Learn/refs/heads/main/load.json"
+                background="transparent"
+                speed="1"
+                style="width: 150px; height: 150px;"
+                loop
+                autoplay>
+            </lottie-player>
+        </div>
+        <p id="success-quote" class="success-quote">Так держать!</p>
+        <button id="continue-btn" class="primary-btn continue-btn">Продолжить</button>
+    </div>
+
+    <!-- Learn It Modal (Incorrect Answer) -->
+    <div id="learn-modal" class="learn-modal">
+        <div class="learn-handle"></div>
+        <h3>Правильный ответ:</h3>
+        <div class="learn-gift-preview">
+            <img id="learn-image" src="" alt="Gift">
+        </div>
+        <h2 id="learn-name">Название</h2>
+        <button id="learned-btn" class="primary-btn learned-btn">Я выучил</button>
+    </div>
+
+    <!-- Review Mistakes Modal (End of lesson) -->
+    <div id="review-modal" class="review-modal">
+        <div class="review-handle"></div>
+        <div class="review-icon-container">
+            <img src="again.webp" alt="Again" class="review-large-icon">
+        </div>
+        <h2>Поработайте над ошибками</h2>
+        <p>Нужно повторить то, что не запомнилось</p>
+        <button id="start-review-btn" class="primary-btn review-btn">Приступить</button>
+    </div>
+
+    <!-- Main Header -->
     <header class="main-header">
         <div class="header-item streaks">
             <img src="Fire.webp" alt="Fire" class="header-icon">
@@ -19,25 +92,69 @@
         </div>
     </header>
 
-    <main class="content">
+    <!-- Main Menu -->
+    <main class="content" id="main-menu">
         <div class="banner-block" id="education-engine">
+            <img src="демо.jpg" alt="Education" class="banner-img">
             <div class="banner-overlay">
                 <h2>Движок Обучения</h2>
                 <p>Учи названия подарков и их историю</p>
             </div>
-            <!-- Сюда вставится фото баннера -->
-            <div class="banner-placeholder"></div>
         </div>
 
         <div class="banner-block" id="memory-game">
+            <img src="демо.jpg" alt="Memory" class="banner-img">
             <div class="banner-overlay">
                 <h2>Режим "Пары"</h2>
                 <p>Тренируй память на время</p>
             </div>
-            <!-- Сюда вставится фото баннера -->
-            <div class="banner-placeholder"></div>
         </div>
     </main>
+
+    <!-- Lesson Screen -->
+    <div id="lesson-screen" class="hidden">
+
+        <header class="lesson-header">
+            <button id="back-btn" class="icon-btn">✕</button>
+            <div class="progress-container">
+                <div id="progress-bar" style="width: 10%;"></div>
+            </div>
+            <div id="repetition-badge" class="repetition-badge hidden">
+                <img src="again.webp" alt="Again" class="again-icon">
+                <span>ПОВТОРЕНИЕ</span>
+            </div>
+            <div class="header-item lives">
+                <span class="count" id="lives-count">5</span>
+                <img src="Heart.webp" alt="Heart" class="header-icon">
+            </div>
+        </header>
+
+        <!-- Modals were moved outside to fix z-index -->
+
+
+        <div class="quiz-wrapper">
+            <div class="quiz-container" id="quiz-container">
+                <div class="gift-card">
+                    <img src="демо.jpg" alt="Gift" id="quiz-image" class="banner-img">
+                </div>
+                
+                <h1 id="quiz-question">Как называется этот подарок?</h1>
+
+                <div id="options-container" class="options-grid">
+                    <button class="option-btn" data-index="0">Демо 1</button>
+                    <button class="option-btn" data-index="1">Демо 2</button>
+                    <button class="option-btn" data-index="2">Демо 3</button>
+                </div>
+
+                <button id="check-btn" class="primary-btn check-btn hidden">Проверить</button>
+
+                <div id="input-container" class="hidden">
+                    <input type="text" id="quiz-input" placeholder="Введите название..." autocomplete="off">
+                    <button id="submit-btn" class="primary-btn">Проверить</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>

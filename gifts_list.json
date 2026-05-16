@@ -1,0 +1,458 @@
+[
+    {
+        "name":  "Desk Calendars",
+        "slug":  "desk-calendar"
+    },
+    {
+        "name":  "Jingle Bellses",
+        "slug":  "jingle-bells"
+    },
+    {
+        "name":  "B-Day Candles",
+        "slug":  "b-day-candle"
+    },
+    {
+        "name":  "Ginger Cookies",
+        "slug":  "ginger-cookie"
+    },
+    {
+        "name":  "Jester Hats",
+        "slug":  "jester-hat"
+    },
+    {
+        "name":  "Lol Pops",
+        "slug":  "lol-pop"
+    },
+    {
+        "name":  "Party Sparklers",
+        "slug":  "party-sparkler"
+    },
+    {
+        "name":  "Sakura Flowers",
+        "slug":  "sakura-flower"
+    },
+    {
+        "name":  "Spiced Wines",
+        "slug":  "spiced-wine"
+    },
+    {
+        "name":  "Bunny Muffins",
+        "slug":  "bunny-muffin"
+    },
+    {
+        "name":  "Diamond Rings",
+        "slug":  "diamond-ring"
+    },
+    {
+        "name":  "Jelly Bunnies",
+        "slug":  "jelly-bunny"
+    },
+    {
+        "name":  "Hanging Stars",
+        "slug":  "hanging-star"
+    },
+    {
+        "name":  "Mini Oscars",
+        "slug":  "mini-oscar"
+    },
+    {
+        "name":  "Hypno Lollipops",
+        "slug":  "hypno-lollipop"
+    },
+    {
+        "name":  "Snow Mittenses",
+        "slug":  "snow-mittens"
+    },
+    {
+        "name":  "Tama Gadgets",
+        "slug":  "tama-gadget"
+    },
+    {
+        "name":  "Lunar Snakes",
+        "slug":  "lunar-snake"
+    },
+    {
+        "name":  "Witch Hats",
+        "slug":  "witch-hat"
+    },
+    {
+        "name":  "Cookie Hearts",
+        "slug":  "cookie-heart"
+    },
+    {
+        "name":  "Homemade Cakes",
+        "slug":  "homemade-cake"
+    },
+    {
+        "name":  "Hex Pots",
+        "slug":  "hex-pot"
+    },
+    {
+        "name":  "Loot Bags",
+        "slug":  "loot-bag"
+    },
+    {
+        "name":  "Precious Peaches",
+        "slug":  "precious-peach"
+    },
+    {
+        "name":  "Spy Agarics",
+        "slug":  "spy-agaric"
+    },
+    {
+        "name":  "Record Players",
+        "slug":  "record-player"
+    },
+    {
+        "name":  "Star Notepads",
+        "slug":  "star-notepad"
+    },
+    {
+        "name":  "Berry Boxes",
+        "slug":  "berry-box"
+    },
+    {
+        "name":  "Love Potions",
+        "slug":  "love-potion"
+    },
+    {
+        "name":  "Top Hats",
+        "slug":  "top-hat"
+    },
+    {
+        "name":  "Toy Bears",
+        "slug":  "toy-bear"
+    },
+    {
+        "name":  "Winter Wreaths",
+        "slug":  "winter-wreath"
+    },
+    {
+        "name":  "Santa Hats",
+        "slug":  "santa-hat"
+    },
+    {
+        "name":  "Eternal Candles",
+        "slug":  "eternal-candle"
+    },
+    {
+        "name":  "Xmas Stockings",
+        "slug":  "xmas-stocking"
+    },
+    {
+        "name":  "Easter Eggs",
+        "slug":  "easter-egg"
+    },
+    {
+        "name":  "Artisan Bricks",
+        "slug":  "artisan-brick"
+    },
+    {
+        "name":  "Input Keys",
+        "slug":  "input-key"
+    },
+    {
+        "name":  "Neko Helmets",
+        "slug":  "neko-helmet"
+    },
+    {
+        "name":  "Jack-in-the-Box",
+        "slug":  "jack-in-the-box"
+    },
+    {
+        "name":  "Khabib’s Papakhas",
+        "slug":  "khabib-s-papakha"
+    },
+    {
+        "name":  "Big Years",
+        "slug":  "big-year"
+    },
+    {
+        "name":  "Crystal Balls",
+        "slug":  "crystal-ball"
+    },
+    {
+        "name":  "Durov’s Caps",
+        "slug":  "durov-s-cap"
+    },
+    {
+        "name":  "Vintage Cigars",
+        "slug":  "vintage-cigar"
+    },
+    {
+        "name":  "Timeless Book",
+        "slug":  "timeless-book"
+    },
+    {
+        "name":  "Chill Flame",
+        "slug":  "chill-flame"
+    },
+    {
+        "name":  "Light Swords",
+        "slug":  "light-sword"
+    },
+    {
+        "name":  "Pet Snakes",
+        "slug":  "pet-snake"
+    },
+    {
+        "name":  "Rare Birds",
+        "slug":  "rare-bird"
+    },
+    {
+        "name":  "Astral Shards",
+        "slug":  "astral-shard"
+    },
+    {
+        "name":  "Bling Binkies",
+        "slug":  "bling-binky"
+    },
+    {
+        "name":  "Bonded Rings",
+        "slug":  "bonded-ring"
+    },
+    {
+        "name":  "Bow Ties",
+        "slug":  "bow-tie"
+    },
+    {
+        "name":  "Candy Canes",
+        "slug":  "candy-cane"
+    },
+    {
+        "name":  "Clover Pins",
+        "slug":  "clover-pin"
+    },
+    {
+        "name":  "Cupid Charms",
+        "slug":  "cupid-charm"
+    },
+    {
+        "name":  "Eternal Roses",
+        "slug":  "eternal-rose"
+    },
+    {
+        "name":  "Evil Eyes",
+        "slug":  "evil-eye"
+    },
+    {
+        "name":  "Faith Amulets",
+        "slug":  "faith-amulet"
+    },
+    {
+        "name":  "Flying Brooms",
+        "slug":  "flying-broom"
+    },
+    {
+        "name":  "Fresh Socks",
+        "slug":  "fresh-socks"
+    },
+    {
+        "name":  "Happy Brownies",
+        "slug":  "happy-brownie"
+    },
+    {
+        "name":  "Heroic Helmets",
+        "slug":  "heroic-helmet"
+    },
+    {
+        "name":  "Holiday Drinks",
+        "slug":  "holiday-drink"
+    },
+    {
+        "name":  "Ice Cream",
+        "slug":  "ice-cream"
+    },
+    {
+        "name":  "Instant Ramens",
+        "slug":  "instant-ramen"
+    },
+    {
+        "name":  "Ionic Dryers",
+        "slug":  "ionic-dryer"
+    },
+    {
+        "name":  "Jolly Chimps",
+        "slug":  "jolly-chimp"
+    },
+    {
+        "name":  "Joyful Bundles",
+        "slug":  "joyful-bundle"
+    },
+    {
+        "name":  "Kissed Frogs",
+        "slug":  "kissed-frog"
+    },
+    {
+        "name":  "Love Candles",
+        "slug":  "love-candle"
+    },
+    {
+        "name":  "Low Riders",
+        "slug":  "low-rider"
+    },
+    {
+        "name":  "Lush Bouquets",
+        "slug":  "lush-bouquet"
+    },
+    {
+        "name":  "Mad Pumpkins",
+        "slug":  "mad-pumpkin"
+    },
+    {
+        "name":  "Magic Potions",
+        "slug":  "magic-potion"
+    },
+    {
+        "name":  "Money Pots",
+        "slug":  "money-pot"
+    },
+    {
+        "name":  "Mood Pack",
+        "slug":  "mood-pack"
+    },
+    {
+        "name":  "Moon Pendants",
+        "slug":  "moon-pendant"
+    },
+    {
+        "name":  "Mousse Cakes",
+        "slug":  "mousse-cake"
+    },
+    {
+        "name":  "Nail Bracelets",
+        "slug":  "nail-bracelet"
+    },
+    {
+        "name":  "Plush Pepes",
+        "slug":  "plush-pepe"
+    },
+    {
+        "name":  "Pool Floats",
+        "slug":  "pool-float"
+    },
+    {
+        "name":  "Restless Jars",
+        "slug":  "restless-jar"
+    },
+    {
+        "name":  "Scared Cats",
+        "slug":  "scared-cat"
+    },
+    {
+        "name":  "Signet Rings",
+        "slug":  "signet-ring"
+    },
+    {
+        "name":  "Skull Flowers",
+        "slug":  "skull-flower"
+    },
+    {
+        "name":  "Sleigh Bells",
+        "slug":  "sleigh-bell"
+    },
+    {
+        "name":  "Snoop Cigars",
+        "slug":  "snoop-cigar"
+    },
+    {
+        "name":  "Snoop Doggs",
+        "slug":  "snoop-dogg"
+    },
+    {
+        "name":  "Snow Globes",
+        "slug":  "snow-globe"
+    },
+    {
+        "name":  "Spring Baskets",
+        "slug":  "spring-basket"
+    },
+    {
+        "name":  "Stellar Rockets",
+        "slug":  "stellar-rocket"
+    },
+    {
+        "name":  "Swag Bags",
+        "slug":  "swag-bag"
+    },
+    {
+        "name":  "Swiss Watch",
+        "slug":  "swiss-watch"
+    },
+    {
+        "name":  "Trapped Hearts",
+        "slug":  "trapped-heart"
+    },
+    {
+        "name":  "Vice Cream",
+        "slug":  "vice-cream"
+    },
+    {
+        "name":  "Victory Medals",
+        "slug":  "victory-medal"
+    },
+    {
+        "name":  "Westside Signs",
+        "slug":  "westside-sign"
+    },
+    {
+        "name":  "Whip Cupcakes",
+        "slug":  "whip-cupcake"
+    },
+    {
+        "name":  "Mighty Arms",
+        "slug":  "mighty-arm"
+    },
+    {
+        "name":  "Sharp Tongues",
+        "slug":  "sharp-tongue"
+    },
+    {
+        "name":  "Gem Signets",
+        "slug":  "gem-signet"
+    },
+    {
+        "name":  "Genie Lamps",
+        "slug":  "genie-lamp"
+    },
+    {
+        "name":  "Ion Gems",
+        "slug":  "ion-gem"
+    },
+    {
+        "name":  "Voodoo Dolls",
+        "slug":  "voodoo-doll"
+    },
+    {
+        "name":  "Sky Stilettoses",
+        "slug":  "sky-stilettos"
+    },
+    {
+        "name":  "Electric Skulls",
+        "slug":  "electric-skull"
+    },
+    {
+        "name":  "Perfume Bottles",
+        "slug":  "perfume-bottle"
+    },
+    {
+        "name":  "UFC Strikes",
+        "slug":  "ufc-strike"
+    },
+    {
+        "name":  "Heart Lockets",
+        "slug":  "heart-locket"
+    },
+    {
+        "name":  "Valentine Boxes",
+        "slug":  "valentine-box"
+    },
+    {
+        "name":  "Snake Boxes",
+        "slug":  "snake-box"
+    },
+    {
+        "name":  "Pretty Posies",
+        "slug":  "pretty-posy"
+    }
+]
