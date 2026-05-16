@@ -207,6 +207,7 @@ async function startLesson() {
     
     lessonStartTime = Date.now();
     totalMistakes = 0;
+    window.bonusAdded = false;
 
     // Предзагрузка всех картинок для плавности на телефонах
     const preloadPromises = questionQueue.map(q => {
@@ -267,18 +268,34 @@ function renderQuestion() {
     // Картинка
     document.getElementById('quiz-image').src = q.image;
 
-    // Варианты ответов
-    const btns = optionsContainer.querySelectorAll('.option-btn');
-    btns.forEach((btn, i) => {
-        btn.innerText = q.options[i] || '';
-        btn.classList.remove('selected', 'wrong', 'correct');
-    });
+    // Определяем ручной режим бонусных вопросов
+    isManualMode = (!isRepetitionPhase && window.bonusAdded && currentQueueIndex >= 13);
 
     // Сброс состояния
     selectedAnswer = null;
     checkBtn.classList.add('hidden');
-    optionsContainer.classList.remove('hidden');
-    inputContainer.classList.add('hidden');
+
+    if (isManualMode) {
+        optionsContainer.classList.add('hidden');
+        inputContainer.classList.remove('hidden');
+        const inputField = document.getElementById('quiz-input');
+        inputField.value = '';
+        inputField.style.borderColor = '';
+        inputField.style.color = '';
+        document.getElementById('submit-btn').disabled = false;
+        quizQuestion.innerText = 'Введите название этого подарка:';
+    } else {
+        optionsContainer.classList.remove('hidden');
+        inputContainer.classList.add('hidden');
+        quizQuestion.innerText = 'Как называется этот подарок?';
+        
+        // Варианты ответов
+        const btns = optionsContainer.querySelectorAll('.option-btn');
+        btns.forEach((btn, i) => {
+            btn.innerText = q.options[i] || '';
+            btn.classList.remove('selected', 'wrong', 'correct');
+        });
+    }
 }
 
 // ─── ВЫБОР ВАРИАНТА ──────────────────────────────────────────────────────────
@@ -309,22 +326,47 @@ function checkAnswer() {
     tg.HapticFeedback.impactOccurred('medium');
 
     const q = currentQueue[currentQueueIndex];
-    const isCorrect = selectedAnswer === q.correct;
+    let isCorrect = false;
+
+    if (isManualMode) {
+        const normalize = (str) => {
+            let s = str.trim().toLowerCase();
+            if (s.endsWith('s')) s = s.slice(0, -1);
+            return s;
+        };
+        isCorrect = normalize(selectedAnswer) === normalize(q.correct);
+    } else {
+        isCorrect = selectedAnswer === q.correct;
+    }
 
     if (isCorrect) {
         tg.HapticFeedback.notificationOccurred('success');
         
-        // Подсвечиваем зеленым
-        optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
-            if (btn.innerText === selectedAnswer) btn.classList.add('correct');
-        });
-        checkBtn.classList.add('hidden');
         selectedAnswer = null; // Сбрасываем выбранный ответ
-        
-        // Быстрый переход без модального окна
-        setTimeout(() => {
-            continueLesson();
-        }, 500);
+
+        if (isManualMode) {
+            const inputField = document.getElementById('quiz-input');
+            inputField.style.borderColor = 'var(--success-color)';
+            inputField.style.color = 'var(--success-color)';
+            document.getElementById('submit-btn').disabled = true;
+            
+            setTimeout(() => {
+                inputField.style.borderColor = '';
+                inputField.style.color = '';
+                continueLesson();
+            }, 500);
+        } else {
+            // Подсвечиваем зеленым
+            optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
+                if (btn.innerText === selectedAnswer) btn.classList.add('correct');
+            });
+            checkBtn.classList.add('hidden');
+            
+            // Быстрый переход
+            setTimeout(() => {
+                continueLesson();
+            }, 500);
+        }
     } else {
         tg.HapticFeedback.notificationOccurred('error');
         showLearnModal(q);
@@ -412,6 +454,22 @@ function continueLesson() {
     currentQueueIndex++;
     
     let currentQueue = isRepetitionPhase ? mistakesQueue : questionQueue;
+
+    // Проверка на бонусный раунд (идеально пройдено 13 вопросов)
+    if (!isRepetitionPhase && currentQueueIndex === 13 && totalMistakes === 0 && !window.bonusAdded) {
+        window.bonusAdded = true;
+        const bonus = generateQuestions(2);
+        
+        // Предзагрузка
+        bonus.forEach(q => {
+            const img = new Image();
+            img.src = q.image;
+        });
+
+        questionQueue.push(...bonus);
+        slideToNext();
+        return;
+    }
 
     if (currentQueueIndex >= currentQueue.length) {
         // Очередь закончилась
