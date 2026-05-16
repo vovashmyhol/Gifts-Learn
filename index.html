@@ -80,6 +80,17 @@
         <button id="start-review-btn" class="primary-btn review-btn">Приступить</button>
     </div>
 
+    <!-- Break Modal (Between Series) -->
+    <div id="break-modal" class="review-modal">
+        <div class="review-handle"></div>
+        <div class="review-icon-container">
+            <img src="Fire.webp" alt="Fire" class="review-large-icon">
+        </div>
+        <h2>Отличная работа!</h2>
+        <p id="break-quote" style="text-align: center; color: var(--hint-color); margin-bottom: 20px;">Перерыв</p>
+        <button id="break-continue-btn" class="primary-btn review-btn">Дальше</button>
+    </div>
+
     <!-- Final Results Modal (Lesson Complete) -->
     <div id="final-modal" class="final-modal">
         <h2 class="final-title">Урок завершен!</h2>
@@ -185,6 +196,27 @@
                     <input type="text" id="quiz-input" placeholder="Введите название..." autocomplete="off">
                     <button id="submit-btn" class="primary-btn">Проверить</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Memory Screen -->
+    <div id="memory-screen" class="hidden">
+        <header class="lesson-header">
+            <button id="memory-back-btn" class="icon-btn">✕</button>
+            <div class="progress-container">
+                <div id="memory-progress-bar" style="width: 0%;"></div>
+            </div>
+            <div class="header-item">
+                <span class="count" id="memory-series-count">Серия 1/3</span>
+            </div>
+        </header>
+
+        <div class="memory-wrapper">
+            <h2 class="memory-title">Соедините пары</h2>
+            <div class="memory-grid">
+                <div class="memory-col" id="memory-col-img"></div>
+                <div class="memory-col" id="memory-col-text"></div>
             </div>
         </div>
     </div>

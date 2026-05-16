@@ -188,6 +188,7 @@ const loadingScreen = document.getElementById('loading-screen');
 const modalOverlay = document.getElementById('modal-overlay');
 const learnModal = document.getElementById('learn-modal');
 const reviewModal = document.getElementById('review-modal');
+const breakModal = document.getElementById('break-modal');
 const finalModal = document.getElementById('final-modal');
 const quizContainer = document.getElementById('quiz-container');
 
@@ -525,3 +526,185 @@ document.getElementById('submit-btn').addEventListener('click', () => {
         tg.HapticFeedback.notificationOccurred('error');
     }
 });
+
+// ─── РЕЖИМ ПАРЫ (MEMORY GAME) ────────────────────────────────────────────────
+
+let memorySeries = 1;
+const MAX_MEMORY_SERIES = 3;
+let memoryPool = []; 
+let memorySelectedTile = null;
+let memoryMatchesLeft = 0;
+
+function startMemoryGame() {
+    tg.HapticFeedback.impactOccurred('medium');
+    memorySeries = 1;
+    lessonStartTime = Date.now();
+    totalMistakes = 0;
+
+    mainMenu.classList.add('hidden');
+    mainHeader.classList.add('hidden');
+    document.getElementById('memory-screen').classList.remove('hidden');
+
+    startMemorySeries();
+}
+
+function startMemorySeries() {
+    document.getElementById('memory-series-count').innerText = `Серия ${memorySeries}/${MAX_MEMORY_SERIES}`;
+    document.getElementById('memory-progress-bar').style.width = '0%';
+    
+    // Берем случайные подарки для серии
+    const gifts = [...giftsData].sort(() => 0.5 - Math.random()).slice(0, 8); // 8 пар на одну серию
+    memoryPool = [...gifts];
+    memoryMatchesLeft = 8;
+    
+    const colImg = document.getElementById('memory-col-img');
+    const colText = document.getElementById('memory-col-text');
+    colImg.innerHTML = '';
+    colText.innerHTML = '';
+    
+    // Выставляем 4 пары на стол
+    const initialPairs = memoryPool.splice(0, 4);
+    
+    let imgTiles = [];
+    let textTiles = [];
+    initialPairs.forEach(g => {
+        imgTiles.push(createMemoryTile({ type: 'img', data: g }));
+        textTiles.push(createMemoryTile({ type: 'text', data: g }));
+    });
+    
+    // Перемешиваем колонки отдельно
+    imgTiles.sort(() => 0.5 - Math.random());
+    textTiles.sort(() => 0.5 - Math.random());
+    
+    imgTiles.forEach(tile => colImg.appendChild(tile));
+    textTiles.forEach(tile => colText.appendChild(tile));
+}
+
+function createMemoryTile(tileData) {
+    const div = document.createElement('div');
+    div.className = 'memory-tile';
+    div.dataset.name = tileData.data.name;
+    div.dataset.type = tileData.type;
+    
+    if (tileData.type === 'img') {
+        const img = document.createElement('img');
+        img.src = tileData.data.file;
+        img.className = 'memory-img';
+        div.appendChild(img);
+    } else {
+        const span = document.createElement('span');
+        span.className = 'memory-text';
+        span.innerText = tileData.data.name;
+        div.appendChild(span);
+    }
+    
+    div.addEventListener('click', () => handleTileClick(div));
+    return div;
+}
+
+function handleTileClick(tile) {
+    if (tile.classList.contains('matched') || tile.classList.contains('selected')) return;
+    
+    tg.HapticFeedback.selectionChanged();
+    
+    if (!memorySelectedTile) {
+        memorySelectedTile = tile;
+        tile.classList.add('selected');
+        return;
+    }
+    
+    const first = memorySelectedTile;
+    const second = tile;
+    memorySelectedTile = null;
+    
+    // Проверка совпадения (имя одинаковое, но типы разные - картинка и текст)
+    if (first.dataset.name === second.dataset.name && first.dataset.type !== second.dataset.type) {
+        first.classList.remove('selected');
+        first.classList.add('matched');
+        second.classList.add('matched');
+        tg.HapticFeedback.notificationOccurred('success');
+        
+        memoryMatchesLeft--;
+        const total = 8; // Так как всего 8 пар в серии
+        const progress = ((total - memoryMatchesLeft) / total) * 100;
+        document.getElementById('memory-progress-bar').style.width = `${progress}%`;
+        
+        setTimeout(() => {
+            // Если есть в пуле, заменяем исчезнувшие плитки новыми прямо на их месте
+            if (memoryPool.length > 0) {
+                const nextGift = memoryPool.shift();
+                const newImgTile = createMemoryTile({ type: 'img', data: nextGift });
+                const newTextTile = createMemoryTile({ type: 'text', data: nextGift });
+                
+                // Анимация плавного появления
+                newImgTile.style.animation = 'fade-in 0.3s ease forwards';
+                newTextTile.style.animation = 'fade-in 0.3s ease forwards';
+                
+                if (first.dataset.type === 'img') {
+                    first.replaceWith(newImgTile);
+                    second.replaceWith(newTextTile);
+                } else {
+                    first.replaceWith(newTextTile);
+                    second.replaceWith(newImgTile);
+                }
+            } else {
+                // Пул пуст. Чтобы не смещались остальные, просто делаем их невидимыми
+                first.style.visibility = 'hidden';
+                second.style.visibility = 'hidden';
+            }
+            
+            if (memoryMatchesLeft === 0) {
+                endMemorySeries();
+            }
+        }, 300);
+        
+    } else {
+        // Ошибка
+        totalMistakes++;
+        first.classList.remove('selected');
+        first.classList.add('wrong');
+        second.classList.add('wrong');
+        tg.HapticFeedback.notificationOccurred('error');
+        
+        setTimeout(() => {
+            first.classList.remove('wrong');
+            second.classList.remove('wrong');
+        }, 400);
+    }
+}
+
+const breakQuotes = [
+    "Отличная память!",
+    "Вы невероятно быстры!",
+    "Продолжайте в том же духе!",
+    "Превосходный результат!",
+    "Вы настоящий эксперт!"
+];
+
+function endMemorySeries() {
+    if (memorySeries >= MAX_MEMORY_SERIES) {
+        // Конец игры
+        document.getElementById('memory-screen').classList.add('hidden');
+        showFinalModal();
+    } else {
+        // Перерыв
+        document.getElementById('break-quote').innerText = breakQuotes[Math.floor(Math.random() * breakQuotes.length)];
+        breakModal.classList.add('active');
+        modalOverlay.classList.add('active');
+    }
+}
+
+document.getElementById('break-continue-btn').addEventListener('click', () => {
+    breakModal.classList.remove('active');
+    modalOverlay.classList.remove('active');
+    memorySeries++;
+    startMemorySeries();
+});
+
+document.getElementById('memory-back-btn').addEventListener('click', () => {
+    document.getElementById('memory-screen').classList.add('hidden');
+    mainMenu.classList.remove('hidden');
+    mainHeader.classList.remove('hidden');
+});
+
+document.getElementById('memory-game').addEventListener('click', startMemoryGame);
