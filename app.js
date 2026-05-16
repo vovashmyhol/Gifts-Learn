@@ -199,31 +199,6 @@ async function startLesson() {
     // Плавное появление загрузочного экрана
     loadingScreen.classList.add('active');
 
-    const waitForImages = (container) => {
-        const images = container.querySelectorAll('img');
-        const promises = Array.from(images).map(img => {
-            if (img.complete) return Promise.resolve();
-            return new Promise(resolve => {
-                img.onload = resolve;
-                img.onerror = resolve;
-            });
-        });
-        return Promise.all(promises);
-    };
-
-    const minDelay = new Promise(resolve => setTimeout(resolve, 1500));
-    const contentLoaded = waitForImages(lessonScreen);
-
-    await Promise.all([minDelay, contentLoaded]);
-
-    mainMenu.classList.add('hidden');
-    mainHeader.classList.add('hidden');
-    lessonScreen.classList.remove('hidden');
-
-    // Плавное скрытие загрузочного экрана
-    loadingScreen.classList.remove('active');
-
-
     // Инициализация очереди
     questionQueue = generateQuestions(13);
     mistakesQueue = [];
@@ -232,7 +207,29 @@ async function startLesson() {
     
     lessonStartTime = Date.now();
     totalMistakes = 0;
+
+    // Предзагрузка всех картинок для плавности на телефонах
+    const preloadPromises = questionQueue.map(q => {
+        return new Promise(resolve => {
+            const img = new Image();
+            img.src = q.image;
+            img.onload = resolve;
+            img.onerror = resolve;
+        });
+    });
+
+    const minDelay = new Promise(resolve => setTimeout(resolve, 1500));
     
+    // Ждем загрузки всех 13 картинок и минимальную анимацию Lottie
+    await Promise.all([minDelay, ...preloadPromises]);
+
+    mainMenu.classList.add('hidden');
+    mainHeader.classList.add('hidden');
+    lessonScreen.classList.remove('hidden');
+
+    // Плавное скрытие загрузочного экрана
+    loadingScreen.classList.remove('active');
+
     document.getElementById('repetition-badge').classList.add('hidden');
 
     selectedAnswer = null;
