@@ -1,710 +1,599 @@
-// Инициализация Telegram WebApp
-const tg = window.Telegram.WebApp;
-tg.expand();
-tg.ready();
+// Initialize Telegram WebApp SDK if available
+const tg = window.Telegram?.WebApp;
 
-tg.setHeaderColor('#1c1c1d');
-tg.setBackgroundColor('#1c1c1d');
-tg.disableVerticalSwipes();
+const TELEGRAM_THEME_COLORS = {
+  default: '--bg-primary',
+  games: '--bg-games',
+  mainWindow: '--bg-main-window',
+};
 
-// Фразы-мотиваторы
-const quotes = [
-    '🔥 Так держать!',
-    '⭐ Отлично! Ты молодец!',
-    '💫 Великолепно! Продолжай!',
-    '🏆 Правильно! Ты настоящий знаток!',
-    '🎯 Браво! Именно так!',
-    '✨ Супер! Ты всё лучше!',
-    '🚀 Молодец! Так держать!',
-    '💎 Идеально! Гордишься собой?',
-    '🌟 Правильно! Ты звезда!',
-    '👑 Король подарков!',
-];
+const TELEGRAM_THEME_FALLBACKS = {
+  default: '#0a0a0d',
+  games: '#0e0c06',
+  mainWindow: '#06162f',
+};
 
+function getThemeColor(themeName = 'default') {
+  const cssVariable = TELEGRAM_THEME_COLORS[themeName] || TELEGRAM_THEME_COLORS.default;
+  const fallback = TELEGRAM_THEME_FALLBACKS[themeName] || TELEGRAM_THEME_FALLBACKS.default;
+  const color = getComputedStyle(document.documentElement).getPropertyValue(cssVariable).trim();
 
-// База данных подарков (названия и пути к файлам)
-const giftsData = [
-    { name: "Artisan Bricks", file: "artisanbrick.webp" },
-    { name: "Astral Shards", file: "astralshard.webp" },
-    { name: "B-Day Candles", file: "bdaycandle.webp" },
-    { name: "Berry Boxes", file: "berrybox.webp" },
-    { name: "Big Years", file: "bigyear.webp" },
-    { name: "Bling Binkies", file: "blingbinky.webp" },
-    { name: "Bonded Rings", file: "bondedring.webp" },
-    { name: "Bow Ties", file: "bowtie.webp" },
-    { name: "Bunny Muffins", file: "bunnymuffin.webp" },
-    { name: "Candy Canes", file: "candycane.webp" },
-    { name: "Clover Pins", file: "cloverpin.webp" },
-    { name: "Cookie Hearts", file: "cookieheart.webp" },
-    { name: "Crystal Balls", file: "crystalball.webp" },
-    { name: "Cupid Charms", file: "cupidcharm.webp" },
-    { name: "Desk Calendars", file: "deskcalendar.webp" },
-    { name: "Diamond Rings", file: "diamondring.webp" },
-    { name: "Durov’s Caps", file: "durovscap.webp" },
-    { name: "Easter Eggs", file: "easteregg.webp" },
-    { name: "Electric Skulls", file: "electricskull.webp" },
-    { name: "Eternal Candles", file: "eternalcandle.webp" },
-    { name: "Eternal Roses", file: "eternalrose.webp" },
-    { name: "Evil Eyes", file: "evileye.webp" },
-    { name: "Faith Amulets", file: "faithamulet.webp" },
-    { name: "Flying Brooms", file: "flyingbroom.webp" },
-    { name: "Fresh Socks", file: "freshsocks.webp" },
-    { name: "Gem Signets", file: "gemsignet.webp" },
-    { name: "Genie Lamps", file: "genielamp.webp" },
-    { name: "Ginger Cookies", file: "gingercookie.webp" },
-    { name: "Hanging Stars", file: "hangingstar.webp" },
-    { name: "Happy Brownies", file: "happybrownie.webp" },
-    { name: "Heart Lockets", file: "heartlocket.webp" },
-    { name: "Heroic Helmets", file: "heroichelmet.webp" },
-    { name: "Hex Pots", file: "hexpot.webp" },
-    { name: "Holiday Drinks", file: "holidaydrink.webp" },
-    { name: "Homemade Cakes", file: "homemadecake.webp" },
-    { name: "Hypno Lollipops", file: "hypnolollipop.webp" },
-    { name: "Ice Cream", file: "icecream.webp" },
-    { name: "Input Keys", file: "inputkey.webp" },
-    { name: "Instant Ramens", file: "instantramen.webp" },
-    { name: "Ion Gems", file: "iongem.webp" },
-    { name: "Ionic Dryers", file: "ionicdryer.webp" },
-    { name: "Jack-in-the-Box", file: "jackinthebox.webp" },
-    { name: "Jelly Bunnies", file: "jellybunny.webp" },
-    { name: "Jester Hats", file: "jesterhat.webp" },
-    { name: "Jingle Bellses", file: "jinglebells.webp" },
-    { name: "Jolly Chimps", file: "jollychimp.webp" },
-    { name: "Joyful Bundles", file: "joyfulbundle.webp" },
-    { name: "Khabib’s Papakhas", file: "khabibspapakha.webp" },
-    { name: "Kissed Frogs", file: "kissedfrog.webp" },
-    { name: "Light Swords", file: "lightsword.webp" },
-    { name: "Lol Pops", file: "lolpop.webp" },
-    { name: "Loot Bags", file: "lootbag.webp" },
-    { name: "Love Candles", file: "lovecandle.webp" },
-    { name: "Love Potions", file: "lovepotion.webp" },
-    { name: "Low Riders", file: "lowrider.webp" },
-    { name: "Lunar Snakes", file: "lunarsnake.webp" },
-    { name: "Lush Bouquets", file: "lushbouquet.webp" },
-    { name: "Mad Pumpkins", file: "madpumpkin.webp" },
-    { name: "Magic Potions", file: "magicpotion.webp" },
-    { name: "Mighty Arms", file: "mightyarm.webp" },
-    { name: "Mini Oscars", file: "minioscar.webp" },
-    { name: "Money Pots", file: "moneypot.webp" },
-    { name: "Moon Pendants", file: "moonpendant.webp" },
-    { name: "Mousse Cakes", file: "moussecake.webp" },
-    { name: "Nail Bracelets", file: "nailbracelet.webp" },
-    { name: "Neko Helmets", file: "nekohelmet.webp" },
-    { name: "Party Sparklers", file: "partysparkler.webp" },
-    { name: "Perfume Bottles", file: "perfumebottle.webp" },
-    { name: "Pet Snakes", file: "petsnake.webp" },
-    { name: "Plush Pepes", file: "plushpepe.webp" },
-    { name: "Precious Peaches", file: "preciouspeach.webp" },
-    { name: "Pretty Posies", file: "prettyposy.webp" },
-    { name: "Rare Birds", file: "rarebird.webp" },
-    { name: "Record Players", file: "recordplayer.webp" },
-    { name: "Restless Jars", file: "restlessjar.webp" },
-    { name: "Sakura Flowers", file: "sakuraflower.webp" },
-    { name: "Santa Hats", file: "santahat.webp" },
-    { name: "Scared Cats", file: "scaredcat.webp" },
-    { name: "Sharp Tongues", file: "sharptongue.webp" },
-    { name: "Signet Rings", file: "signetring.webp" },
-    { name: "Skull Flowers", file: "skullflower.webp" },
-    { name: "Sky Stilettoses", file: "skystilettos.webp" },
-    { name: "Snake Boxes", file: "snakebox.webp" },
-    { name: "Snoop Cigars", file: "snoopcigar.webp" },
-    { name: "Snoop Doggs", file: "snoopdogg.webp" },
-    { name: "Snow Globes", file: "snowglobe.webp" },
-    { name: "Snow Mittenses", file: "snowmittens.webp" },
-    { name: "Spiced Wines", file: "spicedwine.webp" },
-    { name: "Spring Baskets", file: "springbasket.webp" },
-    { name: "Spy Agarics", file: "spyagaric.webp" },
-    { name: "Star Notepads", file: "starnotepad.webp" },
-    { name: "Stellar Rockets", file: "stellarrocket.webp" },
-    { name: "Swag Bags", file: "swagbag.webp" },
-    { name: "Swiss Watch", file: "swisswatch.webp" },
-    { name: "Tama Gadgets", file: "tamagadget.webp" },
-    { name: "Top Hats", file: "tophat.webp" },
-    { name: "Toy Bears", file: "toybear.webp" },
-    { name: "Trapped Hearts", file: "trappedheart.webp" },
-    { name: "UFC Strikes", file: "ufcstrike.webp" },
-    { name: "Valentine Boxes", file: "valentinebox.webp" },
-    { name: "Victory Medals", file: "victorymedal.webp" },
-    { name: "Vintage Cigars", file: "vintagecigar.webp" },
-    { name: "Voodoo Dolls", file: "voodoodoll.webp" },
-    { name: "Westside Signs", file: "westsidesign.webp" },
-    { name: "Whip Cupcakes", file: "whipcupcake.webp" },
-    { name: "Winter Wreaths", file: "winterwreath.webp" },
-    { name: "Witch Hats", file: "witchhat.webp" },
-    { name: "Xmas Stockings", file: "xmasstocking.webp" }
-];
-
-
-
-// Функция генерации вопросов
-function generateQuestions(count = 13) {
-    const questions = [];
-    const shuffledGifts = [...giftsData].sort(() => 0.5 - Math.random());
-    
-    for (let i = 0; i < Math.min(count, shuffledGifts.length); i++) {
-        const correct = shuffledGifts[i];
-        const options = [correct.name];
-        
-        // Добавляем 2 случайных неправильных ответа
-        while (options.length < 3) {
-            const randomGift = giftsData[Math.floor(Math.random() * giftsData.length)];
-            if (!options.includes(randomGift.name)) {
-                options.push(randomGift.name);
-            }
-        }
-        
-        questions.push({
-            image: correct.file,
-            correct: correct.name,
-            options: options.sort(() => 0.5 - Math.random())
-        });
-    }
-    return questions;
+  return color || fallback;
 }
 
+function setTelegramChromeColor(themeName = 'default') {
+  if (!tg) return;
 
-// Очередь вопросов (будет изменяться при ошибках)
-let questionQueue = [];
-let mistakesQueue = [];
-let isRepetitionPhase = false;
-let currentQueueIndex = 0;
-let selectedAnswer = null;
-let isManualMode = false;
+  const color = getThemeColor(themeName);
+  tg.setBackgroundColor(color);
+  tg.setHeaderColor(color);
+}
 
-// Статистика
-let lessonStartTime = 0;
-let totalMistakes = 0;
+if (tg) {
+  // Let Telegram know the app is ready and expand it to full viewport height
+  tg.ready();
+  tg.expand();
+  tg.disableVerticalSwipes?.();
+  
+  // Keep Telegram's native top bar visually merged with the current app background.
+  setTelegramChromeColor('default');
 
-// Элементы
-const mainHeader = document.querySelector('.main-header');
-const mainMenu = document.getElementById('main-menu');
-const lessonScreen = document.getElementById('lesson-screen');
-const progressBar = document.getElementById('progress-bar');
-const optionsContainer = document.getElementById('options-container');
-const inputContainer = document.getElementById('input-container');
-const quizQuestion = document.getElementById('quiz-question');
-const checkBtn = document.getElementById('check-btn');
-const loadingScreen = document.getElementById('loading-screen');
-const modalOverlay = document.getElementById('modal-overlay');
-const learnModal = document.getElementById('learn-modal');
-const reviewModal = document.getElementById('review-modal');
-const breakModal = document.getElementById('break-modal');
-const finalModal = document.getElementById('final-modal');
-const quizContainer = document.getElementById('quiz-container');
+  function applyTelegramSafeArea() {
+    const contentInsets = tg.contentSafeAreaInset;
+    const safeInsets = tg.safeAreaInset;
+    const rawTopInset = Math.max(contentInsets?.top || 0, safeInsets?.top || 0);
+    const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const hasModernIphoneSafeArea = isIos && rawTopInset >= 44;
+    const fullscreenControlsTopInset = hasModernIphoneSafeArea ? 88 : 0;
 
-// ─── ЗАГРУЗКА ────────────────────────────────────────────────────────────────
+    const insets = {
+      top: Math.max(rawTopInset, fullscreenControlsTopInset),
+      right: Math.max(contentInsets?.right || 0, safeInsets?.right || 0),
+      bottom: Math.max(contentInsets?.bottom || 0, safeInsets?.bottom || 0),
+      left: Math.max(contentInsets?.left || 0, safeInsets?.left || 0),
+    };
 
-async function startLesson() {
-    tg.HapticFeedback.impactOccurred('medium');
+    document.body.style.paddingTop = `${insets.top}px`;
+    document.body.style.paddingRight = `${insets.right}px`;
+    document.body.style.paddingBottom = '0px';
+    document.body.style.paddingLeft = `${insets.left}px`;
+    document.documentElement.style.setProperty('--telegram-safe-area-bottom', `${insets.bottom}px`);
+  }
 
-    // Плавное появление загрузочного экрана
-    loadingScreen.classList.add('active');
+  applyTelegramSafeArea();
+  tg.onEvent?.('safeAreaChanged', applyTelegramSafeArea);
+  tg.onEvent?.('contentSafeAreaChanged', applyTelegramSafeArea);
+  tg.onEvent?.('safe_area_changed', applyTelegramSafeArea);
+  tg.onEvent?.('content_safe_area_changed', applyTelegramSafeArea);
+  tg.onEvent?.('fullscreenChanged', applyTelegramSafeArea);
+  tg.onEvent?.('fullscreen_changed', applyTelegramSafeArea);
+  tg.onEvent?.('viewportChanged', () => {
+    tg.expand();
+    tg.disableVerticalSwipes?.();
+  });
+  tg.onEvent?.('viewport_changed', () => {
+    tg.expand();
+    tg.disableVerticalSwipes?.();
+  });
+}
 
-    // Инициализация очереди
-    questionQueue = generateQuestions(13);
-    mistakesQueue = [];
-    isRepetitionPhase = false;
-    currentQueueIndex = 0;
+// App State
+let gems = 1250;
+
+// DOM Elements
+const gemsBlock = document.getElementById('gemsBlock');
+const gemsCount = document.getElementById('gemsCount');
+
+// Helper to format numbers with commas (e.g., 1,250)
+function formatNumber(num) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+// Set initial value
+gemsCount.textContent = formatNumber(gems);
+
+// Trigger standard haptic vibration via Telegram WebApp
+function triggerHaptic(style = 'light') {
+  if (tg && tg.HapticFeedback) {
+    tg.HapticFeedback.impactOccurred(style);
+  }
+}
+
+function mockSendToServer(element, payload = {}) {
+  const action = element.dataset.mockAction || element.id || 'mock-action';
+  const endpoint = element.dataset.mockEndpoint || '/api/mock';
+  const loadingText = element.dataset.mockLoadingText || 'Отправка...';
+  const successText = element.dataset.mockSuccessText || 'Готово';
+  const mockStatus = element.dataset.mockStatus || 'success';
+
+  if (element.tagName === 'BUTTON' || element.tagName === 'A' || element.tagName === 'INPUT') {
+    const originalText = element.textContent?.trim() || '';
+    element.dataset.__originalText = originalText;
+    element.disabled = true;
+    element.textContent = loadingText;
+  }
+
+  console.info(`[mock] -> POST ${endpoint}`, { action, payload });
+
+  return new Promise((resolve) => setTimeout(resolve, 700)).then(() => {
+    const response = {
+      ok: mockStatus === 'success',
+      mocked: true,
+      action,
+      endpoint,
+      payload,
+      status: mockStatus === 'success' ? 200 : 500,
+      message: mockStatus === 'success' ? 'mock response: success' : 'mock response: error'
+    };
+
+    console.info(`[mock] <- ${endpoint}`, response);
+
+    if (element.tagName === 'BUTTON' || element.tagName === 'A' || element.tagName === 'INPUT') {
+      element.textContent = successText;
+    }
+
+    return response;
+  }).finally(() => {
+    if (element.tagName === 'BUTTON' || element.tagName === 'A' || element.tagName === 'INPUT') {
+      const originalText = element.dataset.__originalText || '';
+      element.disabled = false;
+      element.textContent = originalText;
+    }
+  });
+}
+
+// Animate the gems count incrementing smoothly
+function animateGemsCount(targetValue) {
+  const startValue = gems;
+  const duration = 800; // ms
+  const startTime = performance.now();
+  
+  gems = targetValue; // Update state
+  
+  function update(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
     
-    lessonStartTime = Date.now();
-    totalMistakes = 0;
-    window.bonusAdded = false;
+    // Ease out expo curve for standard decelerating feel
+    const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+    const currentValue = Math.floor(startValue + (targetValue - startValue) * easeProgress);
+    
+    gemsCount.textContent = formatNumber(currentValue);
+    
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    } else {
+      gemsCount.textContent = formatNumber(targetValue);
+    }
+  }
+  
+  requestAnimationFrame(update);
+}
 
-    // Предзагрузка всех картинок для плавности на телефонах
-    const preloadPromises = questionQueue.map(q => {
-        return new Promise(resolve => {
-            const img = new Image();
-            img.src = q.image;
-            img.onload = resolve;
-            img.onerror = resolve;
-        });
+// Pulse the entire gems block to give visual feedback
+function pulseGemsBlock() {
+  gemsBlock.style.transform = 'scale(1.12)';
+  
+  setTimeout(() => {
+    gemsBlock.style.transform = '';
+  }, 150);
+}
+
+// Tab Switching Logic
+const navItems = document.querySelectorAll('.nav-item');
+const tabPages = document.querySelectorAll('.tab-page');
+
+navItems.forEach(item => {
+  item.addEventListener('click', () => {
+    const tabName = item.getAttribute('data-tab');
+    if (!tabName) return;
+
+    // Trigger haptic response
+    triggerHaptic('light');
+
+    if (tabName === 'cases') {
+      showSoonToast();
+      return;
+    }
+
+    // Update active tab button style
+    navItems.forEach(nav => nav.classList.remove('active'));
+    item.classList.add('active');
+
+    // Switch visible tab page
+    tabPages.forEach(page => {
+      if (page.id === `tab-${tabName}`) {
+        page.classList.add('active');
+      } else {
+        page.classList.remove('active');
+      }
     });
 
-    const minDelay = new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Ждем загрузки всех 13 картинок и минимальную анимацию Lottie
-    await Promise.all([minDelay, ...preloadPromises]);
-
-    mainMenu.classList.add('hidden');
-    mainHeader.classList.add('hidden');
-    lessonScreen.classList.remove('hidden');
-
-    // Плавное скрытие загрузочного экрана
-    loadingScreen.classList.remove('active');
-
-    document.getElementById('repetition-badge').classList.add('hidden');
-
-    selectedAnswer = null;
-    isManualMode = false;
-
-    renderQuestion();
-}
-
-// ─── ВЫХОД ───────────────────────────────────────────────────────────────────
-
-function exitLesson() {
-    tg.HapticFeedback.impactOccurred('light');
-    lessonScreen.classList.add('hidden');
-    mainMenu.classList.remove('hidden');
-    mainHeader.classList.remove('hidden');
-}
-
-// ─── РЕНДЕР ВОПРОСА ──────────────────────────────────────────────────────────
-
-function renderQuestion() {
-    let currentQueue = isRepetitionPhase ? mistakesQueue : questionQueue;
-
-    // На всякий случай защита
-    if (currentQueueIndex >= currentQueue.length) return;
-
-    const q = currentQueue[currentQueueIndex];
-    const total = currentQueue.length;
-
-    // Прогресс
-    progressBar.style.width = `${(currentQueueIndex / total) * 100}%`;
-
-    // Вопрос
-    quizQuestion.innerText = 'Как называется этот подарок?';
-
-    // Картинка
-    document.getElementById('quiz-image').src = q.image;
-
-    // Определяем ручной режим бонусных вопросов
-    isManualMode = (!isRepetitionPhase && window.bonusAdded && currentQueueIndex >= 13);
-
-    // Сброс состояния
-    selectedAnswer = null;
-    checkBtn.classList.add('hidden');
-
-    if (isManualMode) {
-        optionsContainer.classList.add('hidden');
-        inputContainer.classList.remove('hidden');
-        const inputField = document.getElementById('quiz-input');
-        inputField.value = '';
-        inputField.style.borderColor = '';
-        inputField.style.color = '';
-        document.getElementById('submit-btn').disabled = false;
-        quizQuestion.innerText = 'Введите название этого подарка:';
-    } else {
-        optionsContainer.classList.remove('hidden');
-        inputContainer.classList.add('hidden');
-        quizQuestion.innerText = 'Как называется этот подарок?';
-        
-        // Варианты ответов
-        const btns = optionsContainer.querySelectorAll('.option-btn');
-        btns.forEach((btn, i) => {
-            btn.innerText = q.options[i] || '';
-            btn.classList.remove('selected', 'wrong', 'correct');
-        });
-    }
-}
-
-// ─── ВЫБОР ВАРИАНТА ──────────────────────────────────────────────────────────
-
-function selectOption(btn) {
-    // Снимаем выделение со всех
-    optionsContainer.querySelectorAll('.option-btn').forEach(b => {
-        b.classList.remove('selected');
-    });
-
-    btn.classList.add('selected');
-    selectedAnswer = btn.innerText;
-
-    // Показываем кнопку «Проверить»
-    checkBtn.classList.remove('hidden');
-
-    tg.HapticFeedback.selectionChanged();
-}
-
-// ─── ПРОВЕРКА ОТВЕТА ─────────────────────────────────────────────────────────
-
-function checkAnswer() {
-    if (!selectedAnswer) return;
-
-    let currentQueue = isRepetitionPhase ? mistakesQueue : questionQueue;
-    if (currentQueueIndex >= currentQueue.length) return; // Защита от двойного клика в конце урока
-
-    tg.HapticFeedback.impactOccurred('medium');
-
-    const q = currentQueue[currentQueueIndex];
-    let isCorrect = false;
-
-    if (isManualMode) {
-        const normalize = (str) => {
-            let s = str.trim().toLowerCase();
-            if (s.endsWith('s')) s = s.slice(0, -1);
-            return s;
-        };
-        isCorrect = normalize(selectedAnswer) === normalize(q.correct);
-    } else {
-        isCorrect = selectedAnswer === q.correct;
+    // Restore default logo when switching to any standard tab
+    if (brandLogo) {
+      brandLogo.src = 'TeleFest.webp';
+      brandLogo.alt = 'Tele Fest';
+      brandLogo.style.height = '';
     }
 
-    if (isCorrect) {
-        tg.HapticFeedback.notificationOccurred('success');
-        
-        selectedAnswer = null; // Сбрасываем выбранный ответ
+    document.body.classList.remove('theme-feastables', 'theme-games', 'theme-main-window');
 
-        if (isManualMode) {
-            const inputField = document.getElementById('quiz-input');
-            inputField.style.borderColor = 'var(--success-color)';
-            inputField.style.color = 'var(--success-color)';
-            document.getElementById('submit-btn').disabled = true;
-            
-            setTimeout(() => {
-                inputField.style.borderColor = '';
-                inputField.style.color = '';
-                continueLesson();
-            }, 500);
-        } else {
-            // Подсвечиваем зеленым
-            optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
-                if (btn.innerText === selectedAnswer) btn.classList.add('correct');
-            });
-            checkBtn.classList.add('hidden');
-            
-            // Быстрый переход
-            setTimeout(() => {
-                continueLesson();
-            }, 500);
-        }
+    if (tabName === 'games') {
+      document.body.classList.add('theme-games');
+      setTelegramChromeColor('games');
     } else {
-        tg.HapticFeedback.notificationOccurred('error');
-        showLearnModal(q);
+      setTelegramChromeColor('default');
     }
-}
-
-// ─── НЕПРАВИЛЬНЫЙ ОТВЕТ (РЕЖИМ ОБУЧЕНИЯ) ─────────────────────────────────────
-
-function showLearnModal(q) {
-    optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
-        if (btn.innerText === selectedAnswer) btn.classList.add('wrong');
-        if (btn.innerText === q.correct) btn.classList.add('correct');
-    });
-
-    checkBtn.classList.add('hidden');
-    selectedAnswer = null;
-
-    totalMistakes++;
-
-    // Добавляем вопрос в очередь для повтора
-    mistakesQueue.push(q);
-
-    // Заполняем модальное окно
-    document.getElementById('learn-image').src = q.image;
-    document.getElementById('learn-name').innerText = q.correct;
-    
-    learnModal.classList.add('active');
-    modalOverlay.classList.add('active');
-}
-
-// ─── ОШИБКИ И ПОВТОРЕНИЕ ─────────────────────────────────────────────────────
-
-function showReviewModal() {
-    reviewModal.classList.add('active');
-    modalOverlay.classList.add('active');
-}
-
-document.getElementById('start-review-btn').addEventListener('click', () => {
-    reviewModal.classList.remove('active');
-    modalOverlay.classList.remove('active');
-    
-    isRepetitionPhase = true;
-    currentQueueIndex = 0;
-    document.getElementById('repetition-badge').classList.remove('hidden');
-    renderQuestion();
+  });
 });
 
-document.getElementById('learned-btn').addEventListener('click', () => {
-    learnModal.classList.remove('active');
-    modalOverlay.classList.remove('active');
-    continueLesson();
-});
-
-// ─── ИТОГОВОЕ ОКНО ───────────────────────────────────────────────────────────
-
-function showFinalModal() {
-    tg.HapticFeedback.notificationOccurred('success');
-    
-    const timeTaken = Math.floor((Date.now() - lessonStartTime) / 1000);
-    const minutes = Math.floor(timeTaken / 60).toString().padStart(2, '0');
-    const seconds = (timeTaken % 60).toString().padStart(2, '0');
-    
-    document.getElementById('final-time').innerText = `${minutes}:${seconds}`;
-    document.getElementById('final-mistakes').innerText = totalMistakes;
-    
-    let earnedPoints = Math.max(5, 15 - totalMistakes);
-    document.getElementById('final-points').innerText = `+${earnedPoints}`;
-    
-    const pointsEl = document.querySelector('.streaks .count');
-    pointsEl.innerText = parseInt(pointsEl.innerText) + earnedPoints;
-    
-    finalModal.classList.add('active');
-}
-
-document.getElementById('finish-lesson-btn').addEventListener('click', () => {
-    finalModal.classList.remove('active');
-    exitLesson();
-});
-
-// ─── ПРОДОЛЖИТЬ ──────────────────────────────────────────────────────────────
-
-function continueLesson() {
-    tg.HapticFeedback.impactOccurred('light');
-
-    currentQueueIndex++;
-    
-    let currentQueue = isRepetitionPhase ? mistakesQueue : questionQueue;
-
-    // Проверка на бонусный раунд (идеально пройдено 13 вопросов)
-    if (!isRepetitionPhase && currentQueueIndex === 13 && totalMistakes === 0 && !window.bonusAdded) {
-        window.bonusAdded = true;
-        const bonus = generateQuestions(2);
-        
-        // Предзагрузка
-        bonus.forEach(q => {
-            const img = new Image();
-            img.src = q.image;
-        });
-
-        questionQueue.push(...bonus);
-        slideToNext();
-        return;
-    }
-
-    if (currentQueueIndex >= currentQueue.length) {
-        // Очередь закончилась
-        if (!isRepetitionPhase && mistakesQueue.length > 0) {
-            // Переход к повторению (показываем модалку без слайда)
-            showReviewModal();
-        } else {
-            // Урок полностью завершён
-            showFinalModal();
-        }
-    } else {
-        // Есть следующий вопрос — делаем анимацию перехода
-        slideToNext();
-    }
-}
-
-// ─── АНИМАЦИЯ ПЕРЕХОДА ───────────────────────────────────────────────────────
-
-function slideToNext() {
-    // Слайд влево (текущий улетает)
-    quizContainer.classList.add('slide-out-left');
-
+// Gems Counter click animation
+gemsBlock.addEventListener('click', () => {
+  triggerHaptic('light');
+  pulseGemsBlock();
+  
+  const img = gemsBlock.querySelector('.gems-icon');
+  if (img) {
+    img.style.transform = 'scale(1.3) rotate(15deg)';
     setTimeout(() => {
-        quizContainer.classList.remove('slide-out-left');
-        quizContainer.classList.add('slide-in-right');
-
-        renderQuestion();
-
-        // Убираем класс slide-in после завершения анимации
-        setTimeout(() => {
-            quizContainer.classList.remove('slide-in-right');
-        }, 350);
-    }, 300);
-}
-
-// ─── ОБРАБОТЧИКИ СОБЫТИЙ ────────────────────────────────────────────────────
-
-document.getElementById('education-engine').addEventListener('click', startLesson);
-document.getElementById('back-btn').addEventListener('click', exitLesson);
-
-optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
-    btn.addEventListener('click', () => selectOption(btn));
+      img.style.transform = '';
+    }, 200);
+  }
 });
 
-checkBtn.addEventListener('click', checkAnswer);
+// Main page remains simple and case-based flow is removed.
+const photoCard = document.getElementById('photoCard');
+const photoView = document.getElementById('photoView');
+const brandLogo = document.getElementById('brandLogo');
+const mainOverlay = document.getElementById('mainOverlay');
+const mainOverlayBackdrop = document.getElementById('mainOverlayBackdrop');
+const closeMainOverlayBtn = document.getElementById('closeMainOverlayBtn');
 
-document.getElementById('submit-btn').addEventListener('click', () => {
-    const val = document.getElementById('quiz-input').value;
-    if (val.trim() !== '') {
-        selectedAnswer = val;
-        checkAnswer();
-    } else {
-        tg.HapticFeedback.notificationOccurred('error');
-    }
-});
+function openMainOverlay() {
+  if (brandLogo) {
+    brandLogo.src = 'Feastables.png';
+    brandLogo.alt = 'Feastables';
+  }
 
-// ─── РЕЖИМ ПАРЫ (MEMORY GAME) ────────────────────────────────────────────────
-
-let memorySeries = 1;
-const MAX_MEMORY_SERIES = 3;
-let memoryPool = []; 
-let memorySelectedTile = null;
-let memoryMatchesLeft = 0;
-
-function startMemoryGame() {
-    tg.HapticFeedback.impactOccurred('medium');
-    memorySeries = 1;
-    lessonStartTime = Date.now();
-    totalMistakes = 0;
-
-    mainMenu.classList.add('hidden');
-    mainHeader.classList.add('hidden');
-    document.getElementById('memory-screen').classList.remove('hidden');
-
-    startMemorySeries();
+  mainOverlay?.classList.add('active');
+  mainOverlayBackdrop?.classList.add('active');
 }
 
-function startMemorySeries() {
-    document.getElementById('memory-series-count').innerText = `Серия ${memorySeries}/${MAX_MEMORY_SERIES}`;
-    document.getElementById('memory-progress-bar').style.width = '0%';
+function closeMainOverlay() {
+  mainOverlay?.classList.remove('active');
+  mainOverlayBackdrop?.classList.remove('active');
+
+  if (brandLogo) {
+    brandLogo.src = 'TeleFest.webp';
+    brandLogo.alt = 'Tele Fest';
+  }
+}
+
+if (photoCard && photoView) {
+  photoCard.addEventListener('click', async () => {
+    triggerHaptic('light');
     
-    // Берем случайные подарки для серии
-    const gifts = [...giftsData].sort(() => 0.5 - Math.random()).slice(0, 8); // 8 пар на одну серию
-    memoryPool = [...gifts];
-    memoryMatchesLeft = 8;
-    
-    const colImg = document.getElementById('memory-col-img');
-    const colText = document.getElementById('memory-col-text');
-    colImg.innerHTML = '';
-    colText.innerHTML = '';
-    
-    // Выставляем 4 пары на стол
-    const initialPairs = memoryPool.splice(0, 4);
-    
-    let imgTiles = [];
-    let textTiles = [];
-    initialPairs.forEach(g => {
-        imgTiles.push(createMemoryTile({ type: 'img', data: g }));
-        textTiles.push(createMemoryTile({ type: 'text', data: g }));
+    // Switch visible tab page to the empty one
+    tabPages.forEach(page => {
+      if (page.id === 'tab-main-window') {
+        page.classList.add('active');
+      } else {
+        page.classList.remove('active');
+      }
     });
     
-    // Перемешиваем колонки отдельно
-    imgTiles.sort(() => 0.5 - Math.random());
-    textTiles.sort(() => 0.5 - Math.random());
+    // Remove active class from nav items
+    navItems.forEach(nav => nav.classList.remove('active'));
     
-    imgTiles.forEach(tile => colImg.appendChild(tile));
-    textTiles.forEach(tile => colText.appendChild(tile));
+    // Change logo to Feastables
+    if (brandLogo) {
+      brandLogo.src = 'Feastables.png';
+      brandLogo.alt = 'Feastables';
+      brandLogo.style.height = '40px';
+    }
+
+    document.body.classList.remove('theme-feastables', 'theme-games');
+    document.body.classList.add('theme-main-window');
+    setTelegramChromeColor('mainWindow');
+  });
 }
 
-function createMemoryTile(tileData) {
-    const div = document.createElement('div');
-    div.className = 'memory-tile';
-    div.dataset.name = tileData.data.name;
-    div.dataset.type = tileData.type;
-    
-    if (tileData.type === 'img') {
-        const img = document.createElement('img');
-        img.src = tileData.data.file;
-        img.className = 'memory-img';
-        div.appendChild(img);
-    } else {
-        const span = document.createElement('span');
-        span.className = 'memory-text';
-        span.innerText = tileData.data.name;
-        div.appendChild(span);
+// Generate scattered dots for the Games tab background
+(function spawnGamesDots() {
+  const containers = document.querySelectorAll('.games-dots');
+  if (!containers.length) return;
+
+  const DOT_COUNT = 70;
+
+  containers.forEach(container => {
+    for (let i = 0; i < DOT_COUNT; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'games-dot';
+
+    const size  = 1 + Math.random() * 2;          // 1–3 px
+      const x     = Math.random() * 100;
+      const y     = Math.random() * 100;
+      const op    = (0.2 + Math.random() * 0.6).toFixed(2);
+
+      dot.style.cssText = `
+      width: ${size}px;
+      height: ${size}px;
+      left: ${x}%;
+      top: ${y}%;
+      opacity: ${op};
+      `;
+
+      container.appendChild(dot);
     }
-    
-    div.addEventListener('click', () => handleTileClick(div));
-    return div;
+  });
+})();
+
+let soonToast = null;
+let soonToastTimeout = null;
+
+
+function showSoonToast() {
+  if (!soonToast) {
+    soonToast = document.createElement('div');
+    soonToast.className = 'soon-toast';
+    soonToast.textContent = 'Скоро...';
+    document.body.appendChild(soonToast);
+  }
+  
+  soonToast.classList.remove('show');
+  clearTimeout(soonToastTimeout);
+  
+  setTimeout(() => {
+    soonToast.classList.add('show');
+    triggerHaptic('medium');
+    soonToastTimeout = setTimeout(() => {
+      soonToast.classList.remove('show');
+    }, 1500);
+  }, 10);
 }
 
-function handleTileClick(tile) {
-    if (tile.classList.contains('matched') || tile.classList.contains('selected')) return;
-    
-    tg.HapticFeedback.selectionChanged();
-    
-    if (!memorySelectedTile) {
-        memorySelectedTile = tile;
-        tile.classList.add('selected');
-        return;
-    }
-    
-    const first = memorySelectedTile;
-    const second = tile;
-    memorySelectedTile = null;
-    
-    // Проверка совпадения (имя одинаковое, но типы разные - картинка и текст)
-    if (first.dataset.name === second.dataset.name && first.dataset.type !== second.dataset.type) {
-        first.classList.remove('selected');
-        first.classList.add('matched');
-        second.classList.add('matched');
-        tg.HapticFeedback.notificationOccurred('success');
-        
-        memoryMatchesLeft--;
-        const total = 8; // Так как всего 8 пар в серии
-        const progress = ((total - memoryMatchesLeft) / total) * 100;
-        document.getElementById('memory-progress-bar').style.width = `${progress}%`;
-        
-        setTimeout(() => {
-            // Если есть в пуле, заменяем исчезнувшие плитки новыми прямо на их месте
-            if (memoryPool.length > 0) {
-                const nextGift = memoryPool.shift();
-                const newImgTile = createMemoryTile({ type: 'img', data: nextGift });
-                const newTextTile = createMemoryTile({ type: 'text', data: nextGift });
-                
-                // Анимация плавного появления
-                newImgTile.style.animation = 'fade-in 0.3s ease forwards';
-                newTextTile.style.animation = 'fade-in 0.3s ease forwards';
-                
-                if (first.dataset.type === 'img') {
-                    first.replaceWith(newImgTile);
-                    second.replaceWith(newTextTile);
-                } else {
-                    first.replaceWith(newTextTile);
-                    second.replaceWith(newImgTile);
-                }
-            } else {
-                // Пул пуст. Чтобы не смещались остальные, просто делаем их невидимыми
-                first.style.visibility = 'hidden';
-                second.style.visibility = 'hidden';
-            }
-            
-            if (memoryMatchesLeft === 0) {
-                endMemorySeries();
-            }
-        }, 300);
-        
-    } else {
-        // Ошибка
-        totalMistakes++;
-        first.classList.remove('selected');
-        first.classList.add('wrong');
-        second.classList.add('wrong');
-        tg.HapticFeedback.notificationOccurred('error');
-        
-        setTimeout(() => {
-            first.classList.remove('wrong');
-            second.classList.remove('wrong');
-        }, 400);
-    }
+if (closeMainOverlayBtn) {
+  closeMainOverlayBtn.addEventListener('click', closeMainOverlay);
 }
 
-const breakQuotes = [
-    "Отличная память!",
-    "Вы невероятно быстры!",
-    "Продолжайте в том же духе!",
-    "Превосходный результат!",
-    "Вы настоящий эксперт!"
+if (mainOverlayBackdrop) {
+  mainOverlayBackdrop.addEventListener('click', closeMainOverlay);
+}
+
+const possiblePrizes = [
+  { name: "100 Gems", img: "gems.webp", desc: "Куча драгоценных камней для вашего баланса!" },
+  { name: "500 Gems", img: "gems.webp", desc: "Огромный мешок с сверкающими гемами!" },
+  { name: "Telegram Star", img: "stars-DBKMczxe.png", desc: "Официальная золотая звезда Telegram." },
+  { name: "TeleFest WebApp", img: "TeleFest.webp", desc: "Официальный логотип-награда TeleFest." },
+  { name: "1,000 Gems", img: "gems.webp", desc: "Невероятное богатство драгоценных камней!" },
+  { name: "Супер-Приз", img: "forzaBnner", desc: "Легендарный секретный подарок от организаторов." }
 ];
 
-function endMemorySeries() {
-    if (memorySeries >= MAX_MEMORY_SERIES) {
-        // Конец игры
-        document.getElementById('memory-screen').classList.add('hidden');
-        showFinalModal();
-    } else {
-        // Перерыв
-        document.getElementById('break-quote').innerText = breakQuotes[Math.floor(Math.random() * breakQuotes.length)];
-        breakModal.classList.add('active');
-        modalOverlay.classList.add('active');
-    }
+const caseCards = document.querySelectorAll('.case-card');
+const confirmBackdrop = document.getElementById('confirmBackdrop');
+const confirmBottomSheet = document.getElementById('confirmBottomSheet');
+const sheetCasePhoto = document.getElementById('sheetCasePhoto');
+const sheetCasePrice = document.getElementById('sheetCasePrice');
+const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+const confirmOpenBtn = document.getElementById('confirmOpenBtn');
+
+const rouletteOverlay = document.getElementById('rouletteOverlay');
+const rouletteReel = document.getElementById('rouletteReel');
+const skipAnimBtn = document.getElementById('skipAnimBtn');
+const winOverlay = document.getElementById('winOverlay');
+const winPrizeImg = document.getElementById('winPrizeImg');
+const winPrizeName = document.getElementById('winPrizeName');
+const winPrizeDesc = document.getElementById('winPrizeDesc');
+const winPhotoWrapper = document.getElementById('winPhotoWrapper');
+const collectBtn = document.getElementById('collectBtn');
+
+let selectedCase = null;
+let activeTickCancel = null;
+let spinTimeout = null;
+let winningPrize = null;
+let isCollectingPrize = false;
+
+function closeBottomSheet() {
+  confirmBackdrop.classList.remove('active');
+  confirmBottomSheet.classList.remove('active');
 }
 
-document.getElementById('break-continue-btn').addEventListener('click', () => {
-    breakModal.classList.remove('active');
-    modalOverlay.classList.remove('active');
-    memorySeries++;
-    startMemorySeries();
+caseCards.forEach((card, index) => {
+  card.addEventListener('click', () => {
+    triggerHaptic('medium');
+    selectedCase = {
+      index: index + 1,
+      price: card.querySelector('.price-val').textContent,
+      gradientClass: `case-card-${index + 1}`,
+      photoHTML: card.querySelector('.case-photo-container').innerHTML
+    };
+
+    sheetCasePhoto.innerHTML = selectedCase.photoHTML;
+    sheetCasePhoto.className = `sheet-case-photo ${selectedCase.gradientClass}`;
+    sheetCasePrice.textContent = selectedCase.price;
+
+    confirmBackdrop.classList.add('active');
+    confirmBottomSheet.classList.add('active');
+  });
 });
 
-document.getElementById('memory-back-btn').addEventListener('click', () => {
-    document.getElementById('memory-screen').classList.add('hidden');
-    mainMenu.classList.remove('hidden');
-    mainHeader.classList.remove('hidden');
+confirmBackdrop.addEventListener('click', closeBottomSheet);
+confirmCancelBtn.addEventListener('click', () => {
+  triggerHaptic('light');
+  closeBottomSheet();
 });
 
-document.getElementById('memory-game').addEventListener('click', startMemoryGame);
+confirmOpenBtn.addEventListener('click', () => {
+  if (!selectedCase) return;
+  closeBottomSheet();
+  triggerHaptic('heavy');
+  winningPrize = possiblePrizes[Math.floor(Math.random() * possiblePrizes.length)];
+  rouletteOverlay.classList.add('active');
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const ITEM_H  = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--roulette-item-height')) || 152;
+    const TOTAL   = 60;
+    const WIN_IDX = 52;
+    const SPIN_MS = 8000;
+
+    rouletteReel.innerHTML = '';
+    rouletteReel.style.transition = 'none';
+    rouletteReel.style.transform  = 'translateY(0)';
+
+    const items = [];
+    for (let i = 0; i < TOTAL; i++) {
+      const prize = (i === WIN_IDX)
+        ? winningPrize
+        : possiblePrizes[Math.floor(Math.random() * possiblePrizes.length)];
+
+      const div = document.createElement('div');
+      div.className = 'roulette-item';
+      div.innerHTML = `
+        <img src="${prize.img}" class="roulette-item-img" alt="${prize.name}">
+        <span class="roulette-item-name">${prize.name}</span>
+      `;
+      rouletteReel.appendChild(div);
+      items.push(div);
+    }
+
+    rouletteReel.offsetHeight;
+
+    const viewport   = document.getElementById('rouletteViewport');
+    const vpH        = viewport.clientHeight || window.innerHeight * 0.75;
+    const centreOfVp = vpH / 2;
+    const targetY = centreOfVp - (WIN_IDX * ITEM_H + ITEM_H / 2);
+
+    rouletteReel.style.transition = `transform ${SPIN_MS}ms cubic-bezier(0.03, 0.9, 0.2, 1)`;
+    rouletteReel.style.transform  = `translateY(${targetY}px)`;
+
+    let rafId = null;
+
+    function highlightCentre() {
+      const matrix    = new DOMMatrix(getComputedStyle(rouletteReel).transform);
+      const currentY  = matrix.m42;
+      const centreInReel = centreOfVp - currentY;
+      const idx       = Math.round((centreInReel - ITEM_H / 2) / ITEM_H);
+      const clamped   = Math.max(0, Math.min(TOTAL - 1, idx));
+
+      items.forEach((item, itemIdx) => {
+        const itemCentre = itemIdx * ITEM_H + ITEM_H / 2;
+        const distance = Math.abs(itemCentre - centreInReel) / ITEM_H;
+        const proximity = Math.max(0, 1 - Math.min(distance / 3.6, 1));
+        const focus = proximity * proximity * (3 - 2 * proximity);
+        const scale = 0.84 + focus * 0.3;
+        const opacity = 0.3 + focus * 0.7;
+
+        item.classList.toggle('roulette-item--active', itemIdx === clamped);
+        item.style.setProperty('--roulette-item-scale', scale.toFixed(3));
+        item.style.setProperty('--roulette-item-opacity', opacity.toFixed(3));
+      });
+
+      rafId = requestAnimationFrame(highlightCentre);
+    }
+    rafId = requestAnimationFrame(highlightCentre);
+
+    activeTickCancel = startHapticTicks();
+
+    spinTimeout = setTimeout(() => {
+      cancelAnimationFrame(rafId);
+      endSpinAndShowWin();
+    }, SPIN_MS);
+  }));
+});
+
+skipAnimBtn.addEventListener('click', () => {
+  triggerHaptic('light');
+  endSpinAndShowWin();
+});
+
+function startHapticTicks() {
+  let delay    = 30;
+  let maxDelay = 600;
+  let timerId  = null;
+
+  function tick() {
+    triggerHaptic('light');
+    delay = delay * 1.07;
+    if (delay < maxDelay) {
+      timerId = setTimeout(tick, delay);
+    }
+  }
+  tick();
+  return () => { if (timerId) clearTimeout(timerId); };
+}
+
+function endSpinAndShowWin() {
+  if (activeTickCancel) activeTickCancel();
+  if (spinTimeout) clearTimeout(spinTimeout);
+
+  rouletteOverlay.classList.remove('active');
+  winPrizeImg.src = winningPrize.img;
+  winPrizeName.textContent = winningPrize.name;
+  winPrizeDesc.textContent = winningPrize.desc;
+  winPhotoWrapper.className = 'win-photo-wrapper';
+  winOverlay.classList.add('active');
+  triggerHaptic('heavy');
+  spawnConfetti();
+}
+
+function spawnConfetti() {
+  const container = document.getElementById('fireworksContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  const colors = ['#ffd23f', '#ff9f1c', '#a855f7', '#3b82f6', '#14b8a6', '#ef4444'];
+
+  for (let i = 0; i < 45; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'confetti-particle';
+
+    const angle = Math.random() * Math.PI * 2;
+    const velocity = 90 + Math.random() * 140;
+    const x = Math.cos(angle) * velocity;
+    const y = Math.sin(angle) * velocity - 60;
+
+    particle.style.setProperty('--tx', `${x}px`);
+    particle.style.setProperty('--ty', `${y}px`);
+    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+    const size = 6 + Math.random() * 8;
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+    particle.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    particle.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+    container.appendChild(particle);
+  }
+}
+
+collectBtn.addEventListener('click', async () => {
+  if (isCollectingPrize) return;
+  isCollectingPrize = true;
+  collectBtn.disabled = true;
+  triggerHaptic('medium');
+  await mockSendToServer(collectBtn, { action: 'collect-prize', prize: winningPrize?.name || 'unknown' });
+
+  winPhotoWrapper.classList.add('dive-down');
+  setTimeout(() => triggerHaptic('light'), 160);
+  setTimeout(() => triggerHaptic('medium'), 340);
+
+  setTimeout(() => {
+    winOverlay.classList.add('fade-out');
+  }, 320);
+
+  setTimeout(() => {
+    winOverlay.classList.remove('active');
+    winOverlay.classList.remove('fade-out');
+    winPhotoWrapper.classList.remove('dive-down');
+    collectBtn.disabled = false;
+    isCollectingPrize = false;
+
+    if (winningPrize.name.includes('Gems')) {
+      const amount = parseInt(winningPrize.name.replace(/[^0-9]/g, ''));
+      if (!isNaN(amount)) {
+        animateGemsCount(gems + amount);
+      }
+    }
+
+    selectedCase = null;
+  }, 980);
+});
